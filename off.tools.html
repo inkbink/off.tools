@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
 <title>off.tools</title>
 <!--
   off.tools — a single-file, offline-first toolbox for network & sysadmin work.
@@ -76,6 +78,29 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+/* v0.73 mobile hardening:
+   - color-scheme declares the palette light BY DESIGN, so dark-mode webviews
+     (e.g. opening the file inside an app) stop force-inverting --bg and breaking
+     contrast (a real dark theme stays a possible future *feature*, never forced);
+   - explicit html background keeps over-scroll fringes light;
+   - overflow-x:clip (NOT hidden — clip creates no scroll container, so the sticky
+     topbar keeps working) prevents any tool-level overflow from horizontally
+     scrolling the whole page and dragging the header out of the viewport. */
+:root{color-scheme:light}
+html{background:var(--bg);overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+/* (Safari-on-iPhone finding): iOS WebKit ignores overflow-x:clip on the
+   ROOT element, so per-tool overflow still widened the document → Safari zoom-fit
+   (shrunken-looking topbar) + font boosting (text-size-adjust stops the latter).
+   body is a normal element, where clip IS honored — document width stays capped. */
+body{overflow-x:clip}
+/* Width-class guards: elements with intrinsic sizing must never exceed their
+   container (canvas is safe to scale — skPos() already maps pointer coords by
+   canvas.width/rect.width); and 1fr grid tracks implicitly floor at content
+   width, so one wide child blows the track — min-width:0 on the children of
+   every multi-column grid restores shrinkability. */
+textarea,input,select,pre,table,img{max-width:100%}
+canvas{max-width:100%;height:auto}
+.foot-inner>*,.diff-panes>*,.cfg-grid2>*,.tc-result-grid>*,.grid>*{min-width:0}
 
 /* ---------- App shell ---------- */
 .topbar{
@@ -168,11 +193,26 @@ body:not(.editing) .wc-acts{display:none !important}
 @media(max-width:840px){
   .layout{flex-direction:column}
   .sidebar{width:100%;height:auto;position:static;display:flex;gap:6px;overflow-x:auto;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--surface)}
+  /* v0.73 fix: the strip never engaged — the items live inside #nav, a single flex
+     child, so .sidebar's flex made a row of ONE element and the items stacked
+     full-height. Flexing #nav itself produces the intended one-row swipe strip. */
+  #nav{display:flex;gap:6px}
+  /* v0.73 root-cause fix: .layout{align-items:flex-start} is correct in desktop ROW
+     mode, but once the layout flips to a COLUMN here, align-items governs the
+     HORIZONTAL axis — a non-stretched column item sizes to its CONTENT, so .main
+     became as wide as the active panel's longest unbreakable run (Phrasendrescher's
+     nowrap block lines ≈ 950px, Snippet Vault's longest code line ≈ 620px).
+     .sidebar was already pinned with width:100%; .main never was. */
+  .main{width:100%}
   .nav-label,.sidebar-foot{display:none}
   .nav-item{margin-bottom:0;white-space:nowrap;padding:9px 14px}
   .nav-item.active::before{display:none}
   .main{padding:20px 16px 60px}
   .topbar-inner{padding:0 16px}
+  /* v0.73: long unbroken words (incl. user-customized hero text) must wrap rather
+     than widen the page; panes must be allowed to shrink below content width */
+  .home-tagline,.home-yours,.home-sub{overflow-wrap:break-word}
+  .ph-palette,.ph-compose{min-width:0}
 }
 
 /* ---------- Cards & inputs ---------- */
@@ -312,6 +352,7 @@ tr.r-mod .dnum.right{background:var(--ok-bg);color:var(--ok)}
 .link-ico.r-ok .rdot{background:var(--ok)}
 .link-ico.r-bad .rdot{background:var(--del)}
 .link-ico.r-wait .rdot{background:var(--grey);animation:reachpulse 1s ease-in-out infinite}
+.link-ico.r-na .rdot{background:var(--surface);box-shadow:inset 0 0 0 2px var(--grey)}
 .link-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .link-title{font-family:var(--display);font-weight:600;font-size:.95rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:28px}
 .link-desc{font-size:.82rem;color:var(--text-muted);line-height:1.4}
@@ -653,7 +694,7 @@ body.stale .link-ico .rdot,body.stale .link-ico img,body.stale .hl-dot,body.stal
 .home-layout{display:flex;gap:22px;align-items:flex-start}
 .home-main{flex:1;min-width:0}
 .home-links{width:236px;flex-shrink:0;border-left:1px solid var(--border);padding:2px 4px 4px 18px;align-self:stretch}
-@media(max-width:840px){.home-layout{flex-direction:column}.home-links{width:100%;border-left:none;border-top:1px solid var(--border);padding:16px 4px 4px}}
+@media(max-width:840px){.home-layout{flex-direction:column}.home-main{width:100%}.home-links{width:100%;border-left:none;border-top:1px solid var(--border);padding:16px 4px 4px}}
 .home-links-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding:0 12px}
 .home-links-head h4{font-family:var(--display);font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--text-faint)}
 .home-links-edit{background:none;border:none;color:var(--brand-dark);font-size:.76rem;cursor:pointer;font-family:var(--sans);padding:2px 4px;border-radius:5px}
@@ -670,6 +711,7 @@ body.stale .link-ico .rdot,body.stale .link-ico img,body.stale .hl-dot,body.stal
 .hl-dot.r-ok{background:var(--ok)}
 .hl-dot.r-bad{background:var(--del)}
 .hl-dot.r-wait{background:var(--grey);animation:reachpulse 1.2s ease-in-out infinite}
+.hl-dot.r-na{background:var(--surface);box-shadow:inset 0 0 0 2px var(--grey)}
 .home-brandrow{display:flex;align-items:center;gap:14px;margin-bottom:4px}
 .home-mark{width:42px;height:42px;margin:0;color:var(--brand);flex-shrink:0}
 .home-mark svg{width:100%;height:100%}
@@ -1023,7 +1065,7 @@ It's a <strong>customizable template</strong>, built from plain <strong>HTML, CS
 
 <strong>Make it yours</strong> on the Customize page — links, snippets, clocks, text blocks, language and accent color — then <strong>Save as HTML</strong> to bake it into your own standalone edition you can keep, carry and reopen anywhere, still fully offline.</p>
             <div class="home-sub-edit-wrap" id="homeSubEditWrap" hidden>
-              <textarea class="home-sub-area" id="homeSubArea" maxlength="800" spellcheck="false" aria-label="Edit the description"></textarea>
+              <textarea class="home-sub-area" id="homeSubArea" maxlength="2000" spellcheck="false" aria-label="Edit the description"></textarea>
               <div class="home-sub-edit-acts">
                 <button type="button" class="hse-btn" id="homeSubSave">Save</button>
                 <button type="button" class="hse-btn ghost" id="homeSubCancel">Cancel</button>
@@ -1366,7 +1408,7 @@ It's a <strong>customizable template</strong>, built from plain <strong>HTML, CS
           </div>
           <div class="seg" id="phLangSeg"><button type="button" data-l="en" class="active">EN</button><button type="button" data-l="de">DE</button></div>
         </div>
-        <p class="batch-desc" style="margin:10px 0 14px">Click a block to drop it into the draft on the right, then edit and copy. Placeholders like <code>&lt;source&gt;</code> are yours to fill in. Hover a block to edit or delete it, or add your own below — blocks persist via <strong>Customize → Save as HTML</strong> (the draft itself isn't saved).</p>
+        <p class="batch-desc" style="margin:10px 0 14px">Click a block to drop it into the draft, then edit and copy. Placeholders like <code>&lt;source&gt;</code> are yours to fill in. Hover a block to edit or delete it, or add your own below — blocks persist via <strong>Customize → Save as HTML</strong> (the draft itself isn't saved).</p>
         <div class="ph-layout">
           <div class="ph-palette" id="phPalette"></div>
           <div class="ph-compose">
@@ -1377,7 +1419,7 @@ It's a <strong>customizable template</strong>, built from plain <strong>HTML, CS
               <button class="btn ghost" id="phClear">Clear</button>
               <span class="notes-count" id="phCount"></span>
             </div>
-            <textarea id="phDraft" class="notes-area" spellcheck="false" placeholder="Your message builds up here. Click blocks on the left to insert them at the cursor — then make it yours."></textarea>
+            <textarea id="phDraft" class="notes-area" spellcheck="false" placeholder="Your message builds up here. Click blocks to insert them at the cursor — then make it yours."></textarea>
           </div>
         </div>
       </div>
@@ -1817,7 +1859,7 @@ It's a <strong>customizable template</strong>, built from plain <strong>HTML, CS
 
       <div class="card faq-group">
         <div class="faq-sec">Checking your links</div>
-        <details class="faq-item"><summary>What does “Check links” do?<span class="chev"></span></summary><div class="faq-a"><p>It's a one-off reachability check, not a persistent mode. Press <strong>Check links</strong> in the header (or on the Link Board / home) and off.tools briefly contacts each of your link sites to show whether it currently responds, and loads its favicon. The badge shows a green dot and the logo glows while it's live — about <strong>30 seconds</strong> — then it returns to offline on its own. The last results stay on the tiles, <strong>dimmed</strong>, to show they're a snapshot rather than live, until you check again or reload. It reaches out only when you press the button — no background polling, no permanent connection — you confirm once per session, and nothing is ever saved.</p></div></details>
+        <details class="faq-item"><summary>What does “Check links” do?<span class="chev"></span></summary><div class="faq-a"><p>It's a one-off reachability check, not a persistent mode. Press <strong>Check links</strong> in the header (or on the Link Board / home) and off.tools briefly contacts your link sites — each over its own scheme — to show whether it currently responds, and loads its favicon. The dots read: <strong>green</strong> = responded, <strong>red</strong> = no response, <strong>hollow grey</strong> = not checked (an <code>http</code> link can't be probed while off.tools itself is served over https; opened from a local file, it is probed normally). The badge shows a green dot and the logo glows while it's live — about <strong>30 seconds</strong> — then it returns to offline on its own. The last results stay on the tiles, <strong>dimmed</strong>, to show they're a snapshot rather than live, until you check again or reload. It reaches out only when you press the button — no background polling, no permanent connection — you confirm once per session, and nothing is ever saved.</p></div></details>
         <details class="faq-item"><summary>Why do some link tiles show a red dot?<span class="chev"></span></summary><div class="faq-a"><p>Red means the site didn't answer the last quick check — it may be down, blocked by your network, or simply not reachable from your browser. A site that's actually up can still read red if it refuses these requests. The favicon is checked separately, so a missing favicon no longer makes a site look unreachable.</p></div></details>
       </div>
 
@@ -1864,7 +1906,7 @@ It's a <strong>customizable template</strong>, built from plain <strong>HTML, CS
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.72 · offline-first toolbox</div>
+        <div class="foot-ver">v0.73 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -1900,23 +1942,22 @@ It's a <strong>customizable template</strong>, built from plain <strong>HTML, CS
 <!-- Link board data: editable via "Edit"; portable JSON block for migration -->
 <script type="application/json" id="linksData">
 [
-  {"cat":"Intranet","title":"Intranet Portal","url":"https://intranet.example.net","desc":"Corporate news & internal services","class":"internal","tags":["sso","news","intranet","portal"]},
-  {"cat":"Intranet","title":"Wiki & Runbooks","url":"https://wiki.example.net","desc":"Documentation, runbooks & how-tos","class":"internal","tags":["docs","runbooks","kb","wiki"]},
-  {"cat":"IT services","title":"Service Desk","url":"https://servicedesk.example.net","desc":"Tickets, incidents & assets","class":"internal","tags":["sso","tickets","servicedesk","assets","itsm"]},
-  {"cat":"IT services","title":"Identity & Access","url":"https://idm.example.net","desc":"Access requests, attestations & MFA","class":"internal","tags":["sso","idm","iam","requests","mfa"]},
-  {"cat":"IT services","title":"Monitoring","url":"https://monitoring.example.net","desc":"Dashboards & alerts","class":"internal","tags":["sso","dashboard","monitoring","alerts"]},
-  {"cat":"IT services","title":"Network Controller","url":"https://netctrl.example.net","desc":"LAN, Wi-Fi, switches & APs","class":"internal","tags":["network","switches","wlan","lan"]},
-  {"cat":"IT services","title":"Password Vault","url":"https://vault.example.net","desc":"Shared credentials — restricted access","class":"confidential","tags":["secrets","passwords","vault","restricted"]},
-  {"cat":"IT services","title":"Crisis Bridge","url":"https://bridge.example.net","desc":"On-call escalation & incident war-room","class":"confidential","tags":["incident","oncall","escalation","major-incident"]},
+  {"cat":"Intranet","title":"Intranet Portal","url":"https://intranet.example.net","desc":"Example link — replace with your own via Customize","class":"internal","tags":["example","intranet","portal","template"]},
+  {"cat":"IT services","title":"Password Vault","url":"https://vault.example.net","desc":"Example — confidential links ask for their address when clicked, and never store it","class":"confidential","tags":["example","secrets","vault","confidential"]},
   {"cat":"Vendor docs","title":"Barracuda Campus","url":"https://campus.barracuda.com","desc":"CloudGen Firewall documentation","class":"public","tags":["barracuda","cloudgen","docs","vendor"]},
+  {"cat":"Vendor docs","title":"Cisco Support","url":"https://www.cisco.com/c/en/us/support/index.html","desc":"Product support & configuration guides","class":"public","tags":["cisco","ios","docs","vendor"]},
   {"cat":"Vendor docs","title":"Fortinet Docs","url":"https://docs.fortinet.com","desc":"FortiGate & FortiOS documentation","class":"public","tags":["fortinet","fortigate","docs","vendor"]},
   {"cat":"Vendor docs","title":"Juniper TechLibrary","url":"https://www.juniper.net/documentation/","desc":"Junos & device documentation","class":"public","tags":["juniper","junos","docs","vendor"]},
+  {"cat":"Vendor docs","title":"Microsoft Learn","url":"https://learn.microsoft.com","desc":"Windows Server, M365 & Azure documentation","class":"public","tags":["microsoft","windows","azure","docs","vendor"]},
   {"cat":"Vendor docs","title":"Palo Alto Networks","url":"https://docs.paloaltonetworks.com","desc":"PAN-OS & firewall documentation","class":"public","tags":["paloalto","panos","docs","vendor"]},
+  {"cat":"Reference","title":"RFC Editor","url":"https://www.rfc-editor.org","desc":"Internet standards — the RFC series","class":"public","tags":["rfc","ietf","standards","reference"]},
+  {"cat":"Reference","title":"IANA Assignments","url":"https://www.iana.org/assignments","desc":"Port numbers, protocol numbers & registries","class":"public","tags":["iana","ports","protocols","registry"]},
+  {"cat":"Reference","title":"Hurricane Electric BGP","url":"https://bgp.he.net","desc":"BGP, ASN, prefix & DNS lookup toolkit","class":"public","tags":["bgp","asn","whois","dns","lookup"]},
+  {"cat":"Reference","title":"NVD","url":"https://nvd.nist.gov","desc":"CVE vulnerability database (NIST)","class":"public","tags":["cve","nvd","security","vulnerabilities"]},
   {"cat":"Reference","title":"Wikipedia","url":"https://www.wikipedia.org","desc":"The free encyclopedia","class":"public","tags":["wiki","reference","encyclopedia"]},
   {"cat":"Reference","title":"Heise online","url":"https://www.heise.de/en/","desc":"IT & tech news (English edition)","class":"public","tags":["heise","news","tech","it"]},
-  {"cat":"Reference","title":"ORF","url":"https://orf.at","desc":"Austrian public broadcaster — news","class":"public","tags":["orf","news","austria"]},
-  {"cat":"Break room","title":"Everton — SofaScore","url":"https://www.sofascore.com/team/football/everton/7","desc":"Live scores, fixtures & stats","class":"public","tags":["sofascore","everton","football","scores"]},
-  {"cat":"Break room","title":"IMDb","url":"https://www.imdb.com","desc":"Films, series & ratings","class":"public","tags":["imdb","film","tv","ratings"]}
+  {"cat":"Break room","title":"IMDb","url":"https://www.imdb.com","desc":"Films, series & ratings","class":"public","tags":["imdb","film","tv","ratings"]},
+  {"cat":"Break room","title":"xkcd","url":"https://xkcd.com","desc":"Comics for the technically inclined","class":"public","tags":["xkcd","comics","fun"]}
 ]
 </script>
 
@@ -3220,7 +3261,8 @@ let dashClass='all', reachState={}, favLoaded={};
 function faviconUrl(host){return 'https://'+host+'/favicon.ico';}
 function monoOf(s){const t=(s||'?').trim();return esc((t.charAt(0)||'?').toUpperCase());}
 function favInner(host,mono){ return favLoaded[host]?'<img src="'+esc(faviconUrl(host))+'" alt="" loading="lazy" draggable="false">':'<span class="mono">'+mono+'</span>'; }
-function reachTitle(st){ return st==='ok'?'Reachable':st==='bad'?'No response (host down or blocked)':st==='wait'?'Checking…':''; }
+function schemeOfUrl(u){ try{ return new URL(u).protocol==='http:'?'http':'https'; }catch(e){ return 'https'; } }
+function reachTitle(st){ return st==='ok'?'Reachable':st==='bad'?'No response (host down or blocked)':st==='wait'?'Checking…':st==='na'?"Not checked — http link can't be probed from an https page":''; }
 function favTile(host,title){
   const mono=monoOf(title||host), st=(online||stale)?(reachState[host]||(online?'wait':'')):'';
   return '<span class="link-ico'+(st?' r-'+st:'')+'" data-host="'+esc(host)+'" data-mono="'+mono+'" title="'+esc(reachTitle(st))+'">'+
@@ -3252,17 +3294,20 @@ function updateReach(host){
     else { el.classList.remove('hl-unreach'); }
   });
 }
-function probeHost(h){
+function probeHost(h,scheme){
   /* OFFLINE BOUNDARY — one of only two network calls in the app (the other is
      the favicon Image() load). Reached only from the online module, which is
-     opt-in and off by default. Keep all network use confined here. */
+     opt-in and off by default. Keep all network use confined here.
+     The probe uses the LINK'S OWN scheme (v0.73: http-only internal hosts used to
+     be force-probed over https and always reported "no response"). Targets are
+     still exclusively the user's own Link Board hosts. */
   return new Promise(resolve=>{
     let settled=false; const done=ok=>{ if(settled)return; settled=true; resolve(ok); };
     // network-level reachability: a no-cors request resolves if the host responded at all
     try{
       const ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
       const to=setTimeout(()=>{ if(ctrl)ctrl.abort(); done(false); },6000);
-      fetch('https://'+h+'/',{mode:'no-cors',method:'HEAD',cache:'no-store',redirect:'follow',signal:ctrl?ctrl.signal:undefined})
+      fetch((scheme==='http'?'http':'https')+'://'+h+'/',{mode:'no-cors',method:'HEAD',cache:'no-store',redirect:'follow',signal:ctrl?ctrl.signal:undefined})
         .then(()=>{ clearTimeout(to); done(true); })
         .catch(()=>{ clearTimeout(to); done(false); });
     }catch(e){ done(false); }
@@ -3270,11 +3315,24 @@ function probeHost(h){
 }
 function dashCheckReach(){
   if(!online) return;
-  const hosts=[...new Set(LINKS.map(l=>hostOf(l.url)))];
-  hosts.forEach(h=>{
+  /* Per host, the probe scheme comes from the links themselves: https wins if any
+     link to that host is https; otherwise the host is http-only. */
+  const schemeByHost={};
+  LINKS.forEach(l=>{
+    const h=hostOf(l.url); if(!h) return;
+    if(schemeByHost[h]!=='https') schemeByHost[h]=schemeOfUrl(l.url);
+  });
+  Object.keys(schemeByHost).forEach(h=>{
+    /* http-only host while the app itself is served over https: browsers silently
+       block the mixed-content probe, which used to masquerade as "no response".
+       Report it honestly as "not checked" instead. Under file:// or plain http
+       the probe runs against the link's own scheme. */
+    if(schemeByHost[h]==='http' && location.protocol==='https:'){
+      reachState[h]='na'; favLoaded[h]=false; updateReach(h); return;
+    }
     reachState[h]='wait'; updateReach(h);
     /* reachability: did the host respond? */
-    probeHost(h).then(ok=>{ reachState[h]=ok?'ok':'bad'; updateReach(h); });
+    probeHost(h,schemeByHost[h]).then(ok=>{ reachState[h]=ok?'ok':'bad'; updateReach(h); });
     /* favicon: display only — its absence no longer means "unreachable" */
     const img=new Image();
     img.onload=()=>{ favLoaded[h]=true; updateReach(h); };
@@ -3699,7 +3757,12 @@ function phInsert(text){
   const tail = after && !after.startsWith('\n') ? '\n' : '';
   const ins=lead+text+tail, pos=(before+ins).length;
   ta.value=before+ins+after;
-  ta.focus(); try{ ta.setSelectionRange(pos,pos); }catch(_){}
+  /* Stacked (mobile) layout: focusing would pop the keyboard on every block tap,
+     so scroll the draft into view instead; desktop keeps the focus-and-type flow. */
+  if(window.matchMedia && matchMedia('(max-width:820px)').matches){
+    try{ ta.scrollIntoView({behavior:'smooth',block:'nearest'}); }catch(_){ }
+  } else { ta.focus(); }
+  try{ ta.setSelectionRange(pos,pos); }catch(_){}
   phCount();
 }
 function phCount(){ const v=$('phDraft').value; $('phCount').textContent=v.length?v.length.toLocaleString('en-US')+' chars':''; }
@@ -3797,6 +3860,7 @@ function phAiImport(){
   const err=$('phAiErr'); if(err) err.classList.remove('show');
   const raw=($('phAiImport')?$('phAiImport').value:'').trim();
   if(!raw){ if(err){err.textContent='Paste the JSON your assistant produced first.';err.classList.add('show');} return; }
+  const big=jsonSizeError(raw); if(big){ if(err){err.textContent=big;err.classList.add('show');} return; }
   let data; try{ data=JSON.parse(raw); }catch(e){ if(err){err.textContent='That is not valid JSON: '+e.message;err.classList.add('show');} return; }
   const src=(data && data.phrases)?data.phrases:data;
   let en=[], de=[];
@@ -3953,7 +4017,9 @@ function dashDelete(i){
 function openLinkModal(){ $('linkEditor').value=JSON.stringify(LINKS,null,2); $('linkErr').classList.remove('show'); overlayOpen($('linkModal'), $('linkEditor')); }
 function closeLinkModal(){ overlayClose($('linkModal')); }
 function parseLinkEditor(){
-  const a=JSON.parse($('linkEditor').value);
+  const t=$('linkEditor').value;
+  const big=jsonSizeError(t); if(big) throw new Error(big);
+  const a=JSON.parse(t);
   if(!Array.isArray(a)) throw new Error('The top level must be a list [ … ].');
   return a;
 }
@@ -4341,7 +4407,7 @@ function initHome(){
   const eb=$('homeSubEditBtn'); if(eb) eb.addEventListener('click',()=>homeSubEditOpen(true));
   const cancel=$('homeSubCancel'); if(cancel) cancel.addEventListener('click',()=>homeSubEditOpen(false));
   const save=$('homeSubSave'); if(save) save.addEventListener('click',()=>{
-    HOME.sub=String($('homeSubArea').value||'').slice(0,800);
+    HOME.sub=String($('homeSubArea').value||'').slice(0,HOME_SUB_MAX);
     renderHome();
     if(typeof markCustom==='function') markCustom(cfgLabel);
     homeSubEditOpen(false);
@@ -4837,6 +4903,18 @@ function buildConfig(){
 /* Anti-DoS: generous upper bounds on imported array sizes — never reached in
    real use, but they keep a maliciously huge config from freezing the tab. */
 const IMPORT_CAP={links:2000,snippets:2000,phrases:2000,clocks:1000,vendors:200};
+/* Byte ceiling for any raw JSON a user pastes or imports (config box, config
+   file picker, AI-phrase import, Manage-links editor). 10 MB is far beyond any
+   real config (~3 orders of magnitude over typical) yet parses in ~0.1 s — the
+   guard exists so an accidental or hostile giant payload can't freeze the tab.
+   IMPORT_CAP above limits array *counts*; this limits total *size* (a single
+   unbounded string, e.g. a snippet body, is what this catches). */
+const CONFIG_MAX_BYTES=10*1024*1024;
+const HOME_SUB_MAX=2000;  /* keep in sync with #homeSubArea maxlength in the markup */
+function jsonSizeError(text){
+  const b=new Blob([String(text==null?'':text)]).size;
+  return b>CONFIG_MAX_BYTES ? 'This JSON is too large ('+(b/1048576).toFixed(1)+' MB) — the limit is 10 MB.' : '';
+}
 function applyConfig(cfg,opts){
   /* PERSISTENCE 2/4 — imports + sanitizes untrusted JSON into the globals. */
   opts=opts||{};
@@ -4854,7 +4932,7 @@ function applyConfig(cfg,opts){
   const np=normPhrases(cfg.phrases);
   if(np){ PHRASES=np; if(typeof phRender==='function') phRender($('phSearch')?$('phSearch').value:''); touched=true; }
   if(cfg.home && typeof cfg.home==='object'){
-    if(typeof cfg.home.sub==='string') HOME.sub=cfg.home.sub.slice(0,800);
+    if(typeof cfg.home.sub==='string') HOME.sub=cfg.home.sub.slice(0,HOME_SUB_MAX);
     if(Array.isArray(cfg.home.highlights)){
       const ids=cfg.home.highlights.filter(id=>TOOLS.some(t=>t.id===id)).slice(0,12);
       if(ids.length) HOME.highlights=ids;
@@ -4897,6 +4975,7 @@ function applyConfig(cfg,opts){
 }
 function cfgImportText(text){
   const err=$('cfgErr'); err.classList.remove('show');
+  const big=jsonSizeError(text); if(big){ err.textContent=big; err.classList.add('show'); return; }
   let cfg; try{ cfg=JSON.parse(text); }catch(e){ err.textContent='That is not valid JSON: '+e.message; err.classList.add('show'); return; }
   try{ applyConfig(cfg); cfgSyncTool(); showToast('Configuration applied'); }
   catch(e){ err.textContent=e.message; err.classList.add('show'); }
@@ -4977,6 +5056,11 @@ function initConfig(){
   $('customBadge').addEventListener('click',()=>activate('customize'));
   $('cfgFile').addEventListener('change',e=>{
     const f=e.target.files&&e.target.files[0]; if(!f) return;
+    if(f.size>CONFIG_MAX_BYTES){
+      /* reject before reading — readAsText + textarea assignment of a giant file is the freeze risk */
+      const err=$('cfgErr'); err.textContent='That file is too large ('+(f.size/1048576).toFixed(1)+' MB) — the limit is 10 MB.'; err.classList.add('show');
+      e.target.value=''; return;
+    }
     const r=new FileReader(); r.onload=()=>{ $('cfgPaste').value=r.result; cfgImportText(r.result); }; r.readAsText(f); e.target.value='';
   });
   updateCustomUI();
@@ -5429,7 +5513,15 @@ function cmdkCommands(){
   const a=[];
   a.push({kind:'setup', icon:ICONS.sliders, label:'Open Customize',               hint:'Setup',  keys:'customize setup config branding theme color language home links phrases snippets save export import discard', run:()=>activate('customize')});
   const tools=TOOLS.filter(t=>t.id!=='customize').map(t=>({kind:'tool',icon:t.icon,label:t.label,hint:'Tool',keys:(t.label+' '+t.title+' '+t.sub).toLowerCase(),run:()=>activate(t.id)}));
-  return a.concat(tools);
+  /* Link Board links — launchable from the palette. Gated on the same predicate as
+     every other surface: linkLocked() hides confidential links while the Customize
+     lock is on (and they aren't session-unlocked); with the lock off they're ordinary
+     links. Searchable fields mirror the Link Board filter (stored fields only — a
+     session-entered confidential address never goes into the search keys). */
+  const links=LINKS.filter(l=>!linkLocked(l)).map(l=>({kind:'link',icon:ICONS.ext,label:l.title||l.url,hint:l.cat||'Link',
+    keys:(l.title+' '+l.url+' '+(l.desc||'')+' '+(l.cat||'')+' '+(Array.isArray(l.tags)?l.tags.join(' '):'')).toLowerCase(),
+    run:()=>window.open(linkOpenUrl(l),'_blank','noopener')}));
+  return a.concat(tools,links);
 }
 function cmdkRender(q){
   q=(q||'').toLowerCase().trim();
@@ -5440,7 +5532,7 @@ function cmdkRender(q){
   if(!cmdkFiltered.length){ list.innerHTML='<div class="cmdk-empty">No matching tools or actions.</div>'; return; }
   let html='', lastG=null, inGrid=false;
   cmdkFiltered.forEach((c,i)=>{
-    const g=(c.kind==='tool')?'Tools':'Actions';
+    const g=(c.kind==='tool')?'Tools':(c.kind==='link')?'Links':'Actions';
     if(g!==lastG){
       if(inGrid){ html+='</div>'; inGrid=false; }
       html+='<div class="cmdk-group">'+g+'</div>';
