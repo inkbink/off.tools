@@ -1319,6 +1319,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
           <div class="dash-note" id="dashLockNote" style="display:none;margin:-4px 0 4px"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg> Confidential links aren't given a stored address while locking is on — you enter it when the link is clicked, and it's kept only for the session.</div>
           <div class="field"><label for="dashDesc">Description <span class="lite">— optional</span></label><input type="text" id="dashDesc" placeholder="Short description" spellcheck="false" autocomplete="off"></div>
           <div class="field"><label for="dashTags">Tags <span class="lite">— comma-separated, optional</span></label><input type="text" id="dashTags" placeholder="sso, monitoring" spellcheck="false" autocomplete="off"></div>
+          <label class="ck" style="margin-top:2px"><input type="checkbox" id="dashOnHome" checked> Show on the homepage rail <span class="lite">— the Link Board always shows it</span></label>
           <div class="cfg-actions">
             <button class="btn ghost" id="dashCancel" style="display:none">Cancel edit</button>
             <button class="btn ghost" id="dashGoJson" type="button">Edit all as JSON…</button>
@@ -3490,7 +3491,7 @@ function renderHomeLinks(){
   const el=$('homeLinks'); if(!el)return;
   if(!LINKS.length){ el.innerHTML='<p class="batch-desc" style="margin:0">No links yet — add some in the Customize tool.</p>'; return; }
   const cats=[],byC={};
-  LINKS.forEach(l=>{if(!byC[l.cat]){byC[l.cat]=[];cats.push(l.cat);}byC[l.cat].push(l);});
+  LINKS.forEach(l=>{if(l.onHome===false)return;if(!byC[l.cat]){byC[l.cat]=[];cats.push(l.cat);}byC[l.cat].push(l);});
   el.innerHTML=cats.map(c=>'<div class="hl-cat">'+esc(c)+'</div>'+
     byC[c].map(l=>{
       const gi=LINKS.indexOf(l), locked=linkLocked(l), host=locked?'':hostOf(linkOpenUrl(l));
@@ -4034,7 +4035,7 @@ function initPhrases(){
    ========================================================================= */
 function linksToBlock(arr){ return JSON.stringify(arr,null,2).replace(/</g,'\\u003c'); }
 let dashEditObj=null;
-function dashFormReset(){ dashEditObj=null; ['dashCat','dashTitle','dashUrl','dashDesc','dashTags'].forEach(id=>{if($(id))$(id).value='';}); if($('dashClassSel'))$('dashClassSel').value='internal'; if($('dashAdd'))$('dashAdd').textContent='Add link'; if($('dashFormTitle'))$('dashFormTitle').textContent='Add a link'; if($('dashCancel'))$('dashCancel').style.display='none'; if($('dashAddCard'))$('dashAddCard').open=false; dashSyncLock(); }
+function dashFormReset(){ dashEditObj=null; ['dashCat','dashTitle','dashUrl','dashDesc','dashTags'].forEach(id=>{if($(id))$(id).value='';}); if($('dashClassSel'))$('dashClassSel').value='internal'; if($('dashAdd'))$('dashAdd').textContent='Add link'; if($('dashFormTitle'))$('dashFormTitle').textContent='Add a link'; if($('dashCancel'))$('dashCancel').style.display='none'; if($('dashOnHome'))$('dashOnHome').checked=true; if($('dashAddCard'))$('dashAddCard').open=false; dashSyncLock(); }
 /* When "lock confidential" is on, a confidential link can't take a stored address:
    disable the URL field (its destination is entered at click time instead). */
 function dashSyncLock(){
@@ -4051,6 +4052,7 @@ function dashLoadForm(i){
   $('dashCat').value=l.cat||''; $('dashTitle').value=l.title||''; $('dashUrl').value=l.url||''; $('dashDesc').value=l.desc||'';
   $('dashClassSel').value=['public','internal','confidential'].includes(l.class)?l.class:'internal';
   $('dashTags').value=Array.isArray(l.tags)?l.tags.join(', '):'';
+  if($('dashOnHome'))$('dashOnHome').checked=(l.onHome!==false);
   $('dashAdd').textContent='Save changes'; $('dashFormTitle').textContent='Edit link'; $('dashCancel').style.display='';
   dashSyncLock();
   if($('dashAddCard')){ $('dashAddCard').open=true; $('dashAddCard').scrollIntoView({behavior:'smooth',block:'nearest'}); } $('dashTitle').focus();
@@ -4065,7 +4067,7 @@ function dashSubmit(){
   const cat=$('dashCat').value.trim()||'Links';
   const desc=$('dashDesc').value.trim();
   const tags=$('dashTags').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,12);
-  const obj={cat,title:title||(lock?'Confidential link':url),url,desc,class:cls}; if(tags.length) obj.tags=tags;
+  const obj={cat,title:title||(lock?'Confidential link':url),url,desc,class:cls}; if(tags.length) obj.tags=tags; if($('dashOnHome') && !$('dashOnHome').checked) obj.onHome=false;
   const i=dashEditObj?LINKS.indexOf(dashEditObj):-1;
   if(i>=0){ LINKS[i]=obj; showToast('Link updated'); } else { LINKS.push(obj); showToast('Link added'); }
   if(typeof markCustom==='function') markCustom(cfgLabel);
@@ -5074,6 +5076,7 @@ function applyConfig(cfg,opts){
     LINKS=cfg.links.map(l=>{
       const o={cat:String(l.cat||'Links'),title:String(l.title||l.url||''),url:safeUrl(l.url),desc:l.desc?String(l.desc):'',class:['public','internal','confidential'].includes(l.class)?l.class:'internal'};
       if(Array.isArray(l.tags)){ const t=l.tags.map(x=>String(x).trim()).filter(Boolean).slice(0,12); if(t.length) o.tags=t; }
+      if(typeof l.onHome==='boolean') o.onHome=l.onHome;   // per-link homepage-rail flag (missing = shown)
       return o;
     }).filter(l=>l.url).slice(0,IMPORT_CAP.links);
     unlockedUrls.clear();   /* imported links are new objects — drop any session unlocks */
