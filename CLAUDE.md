@@ -32,10 +32,13 @@ WHAT to build.** Wait for an explicit brief before building.
    mint online accent. The "explainer" light-blue box (tinted gradient + left
    brand accent) is the house style for informational/expandable boxes. Match the
    existing aesthetic; do not introduce a new one.
-5. **Version sync:** the footer `vX.YY · offline-first toolbox` and the filename
-   (when versioned, `off_XX.html`) bump **together**. Exactly one footer version
-   string in the file. Published version numbers are reserved for meaningful
-   releases; dev builds use `vX.YY-devN` footers with matching filenames.
+5. **Version sync:** exactly one footer version string
+   (`vX.YY · offline-first toolbox`) in the file. In-repo, the file is always
+   `off.tools.html`; the footer carries the version (`vX.YY-devN` during dev,
+   `vX.YY` at release). Releases are marked by git tag + published SHA-256.
+   Published version numbers are reserved for meaningful releases. The
+   `off_XX.html` sync rule still applies only if a versioned filename is ever
+   used.
 6. **PERSISTENCE invariant:** any new savable global must be mirrored in all four
    places commented `PERSISTENCE 1/4`–`4/4` (`buildConfig`, `applyConfig`,
    `bakeState`, and the `BASELINE` snapshot in `initConfig`), plus
