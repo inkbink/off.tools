@@ -981,6 +981,11 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 .wc-region{font-weight:600;font-size:.88rem;color:var(--text);line-height:1.25}
 .wc-tz{font-family:var(--mono);font-size:.64rem;font-weight:400;color:var(--text-faint);margin-left:7px}
 .wc-hq{font-size:.58rem;font-weight:700;letter-spacing:.04em;color:var(--brand-dark);background:var(--brand-tint);border-radius:4px;padding:1px 5px;vertical-align:middle;margin-left:5px}
+.wc-row.dev{border-bottom:1px dashed var(--border-strong)}
+.wc-row.dev .wc-region{color:var(--brand-dark)}
+.wc-row.dev .wc-acts{opacity:1}
+.wc-pin{display:flex;align-items:center;justify-content:center;width:24px;height:24px;color:var(--text-faint)}
+.wc-pin svg{width:13px;height:13px;stroke:currentColor;fill:none}
 .wc-sites{font-size:.7rem;color:var(--text-faint);line-height:1.35;margin-top:1px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .wc-off{font-family:var(--mono);font-size:.66rem;color:var(--text-faint);flex-shrink:0;width:46px;text-align:right}
 .wc-time{font-family:var(--mono);font-weight:500;font-size:1.12rem;color:var(--text);flex-shrink:0;width:78px;text-align:right;letter-spacing:-.01em}
@@ -4667,6 +4672,48 @@ let wcFmt24=true, wcTimer=null, wcSel=[], wcEditObj=null;
 let wcKey=null, wcLastMin=null, wcOrder=null;   /* tick/structural-render bookkeeping */
 const WC_EDIT_SVG='<svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
 const WC_DEL_SVG='<svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+const WC_PIN_SVG='<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>';
+/* Synthetic "This device" row — the browser's own zone, resolved once per
+   session. Deliberately NOT in CLOCKS and NOT in the PERSISTENCE set: it is
+   derived state and would be wrong the moment the file travels to another
+   machine. Suppressed in wcRender when an HQ row resolves to the same zone. */
+function wcDeviceZone(){
+  try{ const tz=Intl.DateTimeFormat().resolvedOptions().timeZone; return (tz&&wcTzValid(tz))?tz:null; }catch(e){ return null; }
+}
+const WC_DEV_TZ=wcDeviceZone();
+/* City → IANA-zone aliases for the add-zone suggestions: major cities whose
+   name is not part of any IANA identifier (Mumbai, Beijing, Hamburg …).
+   Rendered as datalist labels — typing the city suggests, picking inserts
+   the zone. Zones are wcTzValid-checked before they reach the datalist. */
+const WC_TZ_ALIASES={
+  'Hamburg':'Europe/Berlin','Munich':'Europe/Berlin','Frankfurt':'Europe/Berlin','Cologne':'Europe/Berlin','Stuttgart':'Europe/Berlin','Düsseldorf':'Europe/Berlin',
+  'Graz':'Europe/Vienna','Linz':'Europe/Vienna','Salzburg':'Europe/Vienna','Innsbruck':'Europe/Vienna',
+  'Geneva':'Europe/Zurich','Basel':'Europe/Zurich','Bern':'Europe/Zurich',
+  'Milan':'Europe/Rome','Turin':'Europe/Rome','Naples':'Europe/Rome',
+  'Barcelona':'Europe/Madrid','Valencia':'Europe/Madrid','Seville':'Europe/Madrid','Bilbao':'Europe/Madrid',
+  'Lyon':'Europe/Paris','Marseille':'Europe/Paris','Toulouse':'Europe/Paris','Nice':'Europe/Paris',
+  'Rotterdam':'Europe/Amsterdam','The Hague':'Europe/Amsterdam','Utrecht':'Europe/Amsterdam',
+  'Antwerp':'Europe/Brussels','Ghent':'Europe/Brussels',
+  'Manchester':'Europe/London','Birmingham':'Europe/London','Edinburgh':'Europe/London','Glasgow':'Europe/London','Leeds':'Europe/London','Cardiff':'Europe/London','Belfast':'Europe/London',
+  'Gothenburg':'Europe/Stockholm','Malmö':'Europe/Stockholm',
+  'Kraków':'Europe/Warsaw','Wrocław':'Europe/Warsaw','Gdańsk':'Europe/Warsaw',
+  'Brno':'Europe/Prague','Porto':'Europe/Lisbon','St. Petersburg':'Europe/Moscow',
+  'Ankara':'Europe/Istanbul','Izmir':'Europe/Istanbul',
+  'Mumbai':'Asia/Kolkata','New Delhi':'Asia/Kolkata','Delhi':'Asia/Kolkata','Bengaluru':'Asia/Kolkata','Bangalore':'Asia/Kolkata','Chennai':'Asia/Kolkata','Hyderabad':'Asia/Kolkata','Pune':'Asia/Kolkata',
+  'Beijing':'Asia/Shanghai','Shenzhen':'Asia/Shanghai','Guangzhou':'Asia/Shanghai','Chengdu':'Asia/Shanghai',
+  'Osaka':'Asia/Tokyo','Nagoya':'Asia/Tokyo','Yokohama':'Asia/Tokyo','Kyoto':'Asia/Tokyo',
+  'Busan':'Asia/Seoul','Incheon':'Asia/Seoul',
+  'Hanoi':'Asia/Ho_Chi_Minh','Da Nang':'Asia/Ho_Chi_Minh',
+  'Abu Dhabi':'Asia/Dubai','Sharjah':'Asia/Dubai','Doha':'Asia/Qatar',
+  'Tel Aviv':'Asia/Jerusalem','Haifa':'Asia/Jerusalem',
+  'Cape Town':'Africa/Johannesburg','Pretoria':'Africa/Johannesburg','Durban':'Africa/Johannesburg',
+  'San Francisco':'America/Los_Angeles','Seattle':'America/Los_Angeles','San Diego':'America/Los_Angeles','Las Vegas':'America/Los_Angeles','Portland':'America/Los_Angeles',
+  'Houston':'America/Chicago','Dallas':'America/Chicago','Austin':'America/Chicago','San Antonio':'America/Chicago','Minneapolis':'America/Chicago','New Orleans':'America/Chicago',
+  'Boston':'America/New_York','Washington DC':'America/New_York','Miami':'America/New_York','Atlanta':'America/New_York','Philadelphia':'America/New_York','Pittsburgh':'America/New_York',
+  'Montreal':'America/Toronto','Ottawa':'America/Toronto','Quebec City':'America/Toronto','Calgary':'America/Edmonton',
+  'Rio de Janeiro':'America/Sao_Paulo','Brasília':'America/Sao_Paulo','Belo Horizonte':'America/Sao_Paulo',
+  'Canberra':'Australia/Sydney','Wellington':'Pacific/Auckland','Christchurch':'Pacific/Auckland'
+};
 function wcOffNum(tz,now){
   const p=new Intl.DateTimeFormat('en-US',{timeZone:tz,timeZoneName:'shortOffset'}).formatToParts(now).find(x=>x.type==='timeZoneName');
   const m=(p?p.value:'').match(/GMT([+-]\d+)(?::(\d+))?/);
@@ -4688,7 +4735,7 @@ function wcHour24(tz,now){
 const WC_SUN='<svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
 const WC_MOON='<svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
 function wcMatch(z,q){ return (String(z.region||'')+' '+String(z.sites||'')+' '+String(z.tz||'')).toLowerCase().includes(q); }
-function wcLabel(tz){ const z=CLOCKS.find(x=>x.tz===tz); return z?(z.region||tz):tz; }
+function wcLabel(tz){ const z=CLOCKS.find(x=>x.tz===tz); if(z) return z.region||tz; return tz===WC_DEV_TZ?'This device':tz; }
 function wcDiffStr(a,b,now){
   const d=wcOffNum(a,now)-wcOffNum(b,now);
   if(Math.abs(d)<1e-6) return 'the same time as';
@@ -4721,7 +4768,11 @@ function wcRowHtml(z,i,now){
   const p=wcParts(z.tz,now), h=wcHour24(z.tz,now), day=h>=6&&h<18;
   const ap=wcFmt24?'':'<span class="ap">'+esc(p.dayPeriod||'')+'</span>';
   const seld=wcSel.indexOf(z.tz)>=0;
-  return '<div class="wc-row'+(z.hq?' hq':'')+(seld?' sel':'')+'" data-tz="'+esc(z.tz)+'" data-i="'+i+'" title="Click to compare">'+
+  const acts=z.dev
+    ? '<span class="wc-pin" title="Detected from this device — session only, never saved">'+WC_PIN_SVG+'</span>'
+    : '<button class="wc-btn" data-act="edit" data-i="'+i+'" title="Edit zone">'+WC_EDIT_SVG+'</button>'+
+      '<button class="wc-btn wc-del" data-act="del" data-i="'+i+'" title="Delete zone">'+WC_DEL_SVG+'</button>';
+  return '<div class="wc-row'+(z.dev?' dev':'')+(z.hq?' hq':'')+(seld?' sel':'')+'" data-tz="'+esc(z.tz)+'" data-i="'+i+'" title="Click to compare">'+
     '<span class="wc-accent'+(day?' day':'')+'"></span>'+
     '<span class="wc-ico'+(day?' day':'')+'" title="'+(day?'Daytime':'Night')+'">'+(day?WC_SUN:WC_MOON)+'</span>'+
     '<div class="wc-main"><div class="wc-region">'+esc(z.region||z.tz)+'<span class="wc-tz">'+esc(z.tz)+'</span>'+(z.hq?'<span class="wc-hq">HQ</span>':'')+'</div>'+
@@ -4729,10 +4780,7 @@ function wcRowHtml(z,i,now){
     '<span class="wc-off">'+esc(wcOffStr(z.tz,now))+'</span>'+
     '<span class="wc-time">'+esc(p.hour)+':'+esc(p.minute)+ap+'</span>'+
     '<span class="wc-day">'+esc(p.weekday||'')+'</span>'+
-    '<span class="wc-acts">'+
-      '<button class="wc-btn" data-act="edit" data-i="'+i+'" title="Edit zone">'+WC_EDIT_SVG+'</button>'+
-      '<button class="wc-btn wc-del" data-act="del" data-i="'+i+'" title="Delete zone">'+WC_DEL_SVG+'</button>'+
-    '</span>'+
+    '<span class="wc-acts">'+acts+'</span>'+
     '</div>';
 }
 function wcRowUpdate(el,z,now){
@@ -4750,17 +4798,30 @@ function wcRender(){
   if($('wcUtc')) $('wcUtc').textContent='UTC '+new Intl.DateTimeFormat('en-GB',{timeZone:'UTC',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now);
   const q=($('wcSearch')?$('wcSearch').value:'').toLowerCase().trim();
   const min=now.getMinutes();
+  /* device row is suppressed when an HQ row already shows the same zone */
+  const devTz=(WC_DEV_TZ && !CLOCKS.some(z=>z.hq&&z.tz===WC_DEV_TZ))?WC_DEV_TZ:null;
   /* cheap structural key (no Intl) — changes when the rows' identity/content does */
-  const key=q+'#'+(wcFmt24?'24':'12')+'#'+wcSel.join(',')+'#'+CLOCKS.map(z=>z.tz+'~'+(z.region||'')+'~'+(z.sites||'')+(z.hq?'!':'')).join('|');
+  const key=q+'#'+(wcFmt24?'24':'12')+'#'+wcSel.join(',')+'#'+(devTz||'')+'#'+CLOCKS.map(z=>z.tz+'~'+(z.region||'')+'~'+(z.sites||'')+(z.hq?'!':'')).join('|');
   if(key===wcKey && min===wcLastMin) return;          /* idle tick: only the UTC seconds moved */
   wcKey=key; wcLastMin=min;
-  wcSel=wcSel.filter(tz=>CLOCKS.some(z=>z.tz===tz));
+  wcSel=wcSel.filter(tz=>CLOCKS.some(z=>z.tz===tz)||tz===devTz);
   wcRenderCompare(now);
-  if(!CLOCKS.length){ if(wcOrder!=='\u2205'){ list.innerHTML='<p class="batch-desc" style="margin:0;padding:14px">No zones yet — add one below.</p>'; wcOrder='\u2205'; } return; }
-  const rows=CLOCKS.map(z=>({z,i:CLOCKS.indexOf(z),off:wcOffNum(z.tz,now)})).filter(r=>!q||wcMatch(r.z,q)).sort((a,b)=>a.off-b.off);
-  if(!rows.length){ if(wcOrder!=='\u2205q'){ list.innerHTML='<div class="dash-empty">No zones match.</div>'; wcOrder='\u2205q'; } return; }
+  /* selected and HQ rows bypass the search filter; the device row is pinned
+     above the offset-sorted list and never filtered */
+  const rows=CLOCKS.map(z=>({z,i:CLOCKS.indexOf(z),off:wcOffNum(z.tz,now)}))
+    .filter(r=>!q||wcMatch(r.z,q)||r.z.hq||wcSel.indexOf(r.z.tz)>=0)
+    .sort((a,b)=>a.off-b.off);
+  if(devTz) rows.unshift({z:{tz:devTz,region:'This device',dev:true},i:-1});
+  if(!rows.length){
+    const mark=CLOCKS.length?'\u2205q':'\u2205';
+    if(wcOrder!==mark){ list.innerHTML=CLOCKS.length?'<div class="dash-empty">No zones match.</div>':'<p class="batch-desc" style="margin:0;padding:14px">No zones yet — add one below.</p>'; wcOrder=mark; }
+    return;
+  }
+  let tail='';
+  if(!CLOCKS.length) tail='<p class="batch-desc" style="margin:0;padding:14px">No zones yet — add one below.</p>';
+  else if(q && rows.length===1 && rows[0].z.dev) tail='<div class="dash-empty">No zones match.</div>';
   const order=rows.map(r=>r.z.tz).join('|')+'@'+key;  /* @key ⇒ a static-content edit rebuilds too */
-  if(order!==wcOrder){ wcOrder=order; list.innerHTML=rows.map(({z,i})=>wcRowHtml(z,i,now)).join(''); }
+  if(order!==wcOrder){ wcOrder=order; list.innerHTML=rows.map(({z,i})=>wcRowHtml(z,i,now)).join('')+tail; }
   else rows.forEach(({z},k)=>wcRowUpdate(list.children[k],z,now));
 }
 function wcTzValid(tz){ try{ new Intl.DateTimeFormat('en-GB',{timeZone:tz}); return true; }catch(e){ return false; } }
@@ -4793,7 +4854,15 @@ function wcDelete(i){
 function wcStart(){ wcRender(); if(wcTimer) clearInterval(wcTimer); wcTimer=setInterval(wcRender,1000); }
 function wcStop(){ if(wcTimer){ clearInterval(wcTimer); wcTimer=null; } }
 function initClocks(){
-  try{ if(typeof Intl.supportedValuesOf==='function'){ const dl=$('wcTzList'); if(dl) dl.innerHTML=Intl.supportedValuesOf('timeZone').map(t=>'<option value="'+esc(t)+'"></option>').join(''); } }catch(e){}
+  try{
+    const dl=$('wcTzList');
+    if(dl){
+      const zones=(typeof Intl.supportedValuesOf==='function')?Intl.supportedValuesOf('timeZone'):[];
+      dl.innerHTML=zones.map(t=>'<option value="'+esc(t)+'"></option>').join('')+
+        Object.keys(WC_TZ_ALIASES).filter(c=>wcTzValid(WC_TZ_ALIASES[c]))
+          .map(c=>'<option value="'+esc(WC_TZ_ALIASES[c])+'">'+esc(c)+'</option>').join('');
+    }
+  }catch(e){}
   $('wcFmt').addEventListener('click',function(){ wcFmt24=!wcFmt24; this.textContent=wcFmt24?'24h':'12h'; wcRender(); });
   if($('wcSearch')) $('wcSearch').addEventListener('input',wcRender);
   if($('wcAdd')) $('wcAdd').addEventListener('click',wcSubmit);
