@@ -394,6 +394,8 @@ body.online .home-reach,body.stale .home-reach{display:inline-flex}
 .link-badge{font-size:.62rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:5px;align-self:flex-start;margin-top:6px}
 .link-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
 .link-meta .link-badge{margin-top:0;align-self:auto}
+.link-railoff{display:inline-flex;align-items:center;color:var(--text-faint)}
+.link-railoff svg{width:13px;height:13px;stroke:currentColor;fill:none}
 .link-tag{font-size:.66rem;color:var(--text-muted);background:var(--brand-tint-2);border:1px solid var(--border);border-radius:20px;padding:2px 9px;cursor:pointer;transition:background .12s,border-color .12s,color .12s}
 .link-tag:hover{border-color:var(--brand);color:var(--brand-dark);background:var(--brand-tint)}
 body.online .nav-item[data-tool="dashboard"]{position:relative}
@@ -1964,7 +1966,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.74-dev4 · offline-first toolbox</div>
+        <div class="foot-ver">v0.74-dev5 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -3444,6 +3446,7 @@ function renderDash(filter){
           (l.desc?'<div class="link-desc">'+esc(l.desc)+'</div>':'')+
           (locked?'<div class="link-host link-host-locked">address hidden — click to open</div>':'<div class="link-host">'+esc(host)+'</div>')+
           '<div class="link-meta">'+
+            (l.onHome===false?'<span class="link-railoff" title="Hidden from homepage rail" aria-label="Hidden from homepage rail"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5l9-7 9 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M3 3l18 18"/></svg></span>':'')+
             (cm?'<span class="link-badge '+cm.c+'">'+cm.l+'</span>':'')+
             tags.map(t=>'<span class="link-tag" data-tag="'+esc(t)+'" title="Filter by &quot;'+esc(t)+'&quot;">'+esc(t)+'</span>').join('')+
           '</div>'+
