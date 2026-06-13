@@ -276,6 +276,11 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .res .v{font-family:var(--mono);font-size:1.02rem;color:var(--text);word-break:break-all;padding-right:22px}
 .res.hl .v{color:var(--brand-dark);font-weight:500}
 .res.special .v{color:var(--ok)}
+/* Subnet Splitter cards: compact, and put the broadcast on its own muted line
+   instead of letting "bc x.x.x.x" wrap orphaned after the range. */
+#splitGrid .res{padding:10px 12px}
+#splitGrid .res .v{word-break:normal;overflow-wrap:anywhere}
+#splitGrid .res .v small{display:block;margin-top:2px;color:var(--text-faint)}
 .res .v small{color:var(--text-faint);font-size:.76rem}
 .copy{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:var(--text-faint);padding:3px;border-radius:5px;transition:.14s;line-height:0}
 .copy:hover{color:var(--brand);background:var(--brand-tint)}
