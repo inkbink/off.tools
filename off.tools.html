@@ -881,6 +881,11 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 .tm-preset span{font-size:.74rem;color:var(--text-muted)}
 .tm-row{align-items:flex-end;flex-wrap:wrap}
 .tm-go{white-space:nowrap}
+/* Narrow screens: stack any .field-row (Subnet/Split/IP-Checker etc.) into a
+   column so inputs + the trailing action button get full width instead of
+   being crushed. Mirrors the .diff-panes 680px breakpoint. Placed after
+   .tm-row so it wins the equal-specificity tie for .field-row.tm-row. */
+@media(max-width:680px){.field-row{flex-direction:column;align-items:stretch}.field-row>.btn{width:100%}}
 /* ---------- Time Calculator ---------- */
 .tc-row{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;padding:11px 0;border-bottom:1px dashed var(--border)}
 .tc-row:first-child{padding-top:0}
@@ -1627,7 +1632,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
         <summary><span class="sn-add-ic"></span><span>Manage vendors</span><span class="sn-add-hint">add, rename or remove vendor groups</span></summary>
         <div class="sn-add-body">
           <div id="snVendorMgr"></div>
-          <div class="field-row" style="align-items:flex-end;margin-top:14px">
+          <div class="field-row" style="margin-top:14px">
             <div class="field"><label for="snVendorNew">Add a vendor</label><input type="text" id="snVendorNew" placeholder="e.g. Aruba, MikroTik …" spellcheck="false" autocomplete="off"></div>
             <button class="btn" id="snVendorAdd" type="button">Add vendor</button>
           </div>
