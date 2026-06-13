@@ -329,8 +329,12 @@ tr.r-mod .dnum.right{background:var(--ok-bg);color:var(--ok)}
 /* ---------- Dashboard ---------- */
 .dash-bar{display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
 .dash-search{flex:1;min-width:200px;position:relative}
-.dash-search input{padding-left:38px}
+.dash-search input{padding-left:38px;padding-right:34px}
 .dash-search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--text-faint);fill:none}
+.search-clear{position:absolute;right:9px;top:50%;transform:translateY(-50%);display:none;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:transparent;border:none;color:var(--text-faint);cursor:pointer;transition:color .14s,background .14s}
+.search-clear:hover{color:var(--text);background:var(--surface-2)}
+.search-clear svg{position:static;transform:none;width:12px;height:12px;stroke:currentColor;fill:none}
+.dash-search input:not(:placeholder-shown)~.search-clear{display:flex}
 .dash-note{font-size:.8rem;color:var(--text-faint);display:flex;align-items:center;gap:7px}
 .dash-note svg{width:15px;height:15px;stroke:var(--brand);fill:none;flex-shrink:0}
 .cat{margin-bottom:26px}
@@ -1911,7 +1915,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.73 · offline-first toolbox</div>
+        <div class="foot-ver">v0.74-dev1 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -2608,6 +2612,19 @@ function copyText(txt,btn,msg){
   else fb(txt,done);
   function fb(t,cb){const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');cb();}catch(e){}document.body.removeChild(ta);}
 }
+/* Clear-X — injects a small × button into a .dash-search field. Visibility is
+   pure CSS (input:not(:placeholder-shown)), so it also tracks programmatic
+   value changes (e.g. the Link Board tag-click). Clicking clears the field,
+   re-fires 'input' so the tool's own filter handler runs, and refocuses. */
+function addClearX(id){
+  const inp=$(id); if(!inp||!inp.parentElement) return;
+  const btn=document.createElement('button');
+  btn.type='button'; btn.className='search-clear'; btn.title='Clear'; btn.setAttribute('aria-label','Clear search');
+  btn.innerHTML='<svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+  btn.addEventListener('click',()=>{ inp.value=''; inp.dispatchEvent(new Event('input',{bubbles:true})); inp.focus(); });
+  inp.parentElement.appendChild(btn);
+}
+function initClearX(){ ['dashSearch','cliSearch','phSearch','wcSearch','snSearch','faqSearchInput'].forEach(addClearX); }
 
 /* =========================================================================
    Navigation (data-driven from TOOLS)
@@ -5661,7 +5678,7 @@ function initCmdK(){
    Bootstrap
    ========================================================================= */
 function initTools(){
-  initConfig(); initHome(); initSubnet(); initSplit(); initIpCheck(); initBaseConv(); initBatch(); initCli(); initScript(); initDiff(); initTokens(); initSearch(); initTimers(); initTimeCalc(); initClocks(); initHdrClock(); initSnippets(); initNotes(); initPhrases(); initSketch(); initDash(); initLinkEditor(); initUnlock(); initOnline(); initCmdK(); initEdit(); initHelp();
+  initConfig(); initHome(); initSubnet(); initSplit(); initIpCheck(); initBaseConv(); initBatch(); initCli(); initScript(); initDiff(); initTokens(); initSearch(); initTimers(); initTimeCalc(); initClocks(); initHdrClock(); initSnippets(); initNotes(); initPhrases(); initSketch(); initDash(); initLinkEditor(); initUnlock(); initOnline(); initCmdK(); initEdit(); initHelp(); initClearX();
   $('brandHome').addEventListener('click',()=>activate('home'));
   $('siteFoot').querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{ const id=b.getAttribute('data-go'); if(id) activate(id); }));
 }
