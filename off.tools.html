@@ -4731,6 +4731,10 @@ const WC_TZ_ALIASES={
   'Rio de Janeiro':'America/Sao_Paulo','Brasília':'America/Sao_Paulo','Belo Horizonte':'America/Sao_Paulo',
   'Canberra':'Australia/Sydney','Wellington':'Pacific/Auckland','Christchurch':'Pacific/Auckland'
 };
+/* Lower-cased city→zone index for case-insensitive submit-time resolution, so
+   typing a bare "Mumbai" + Add works even without picking the datalist hint. */
+const WC_ALIAS_CI={};
+Object.keys(WC_TZ_ALIASES).forEach(c=>{ WC_ALIAS_CI[c.toLowerCase()]=WC_TZ_ALIASES[c]; });
 function wcOffNum(tz,now){
   const p=new Intl.DateTimeFormat('en-US',{timeZone:tz,timeZoneName:'shortOffset'}).formatToParts(now).find(x=>x.type==='timeZoneName');
   const m=(p?p.value:'').match(/GMT([+-]\d+)(?::(\d+))?/);
@@ -4851,8 +4855,9 @@ function wcLoadForm(i){
   if($('wcAddCard')){ $('wcAddCard').open=true; $('wcAddCard').scrollIntoView({behavior:'smooth',block:'nearest'}); } $('wcTz').focus();
 }
 function wcSubmit(){
-  const tz=$('wcTz').value.trim();
-  if(!tz || !wcTzValid(tz)){ showToast('Enter a valid IANA time zone, e.g. Europe/Vienna'); return; }
+  let tz=$('wcTz').value.trim();
+  if(tz && !wcTzValid(tz)){ const z=WC_ALIAS_CI[tz.toLowerCase()]; if(z) tz=z; }   // resolve a known city name → its IANA zone
+  if(!tz || !wcTzValid(tz)){ showToast('Enter a valid IANA time zone or known city, e.g. Europe/Vienna or Mumbai'); return; }
   const region=$('wcRegion').value.trim(), sites=$('wcSites').value.trim(), hq=$('wcHq').checked;
   const obj={tz,region:region||tz,sites}; if(hq) obj.hq=true;
   const i=wcEditObj?CLOCKS.indexOf(wcEditObj):-1;
