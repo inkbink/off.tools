@@ -599,6 +599,17 @@ body.spectrum .cfg-egg{opacity:.7;color:var(--brand)}
 /* two sections side by side on wider viewports */
 .cfg-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
 .cfg-grid2>.cfg-box{margin-top:0}
+/* Tools-in-the-menu editor: grouped show/hide toggles, mirroring the nav grouping */
+.cfg-toolvis{display:grid;grid-template-columns:repeat(2,1fr);gap:3px 18px}
+.cfg-toolvis-h{grid-column:1/-1;font-family:var(--display);font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);margin:13px 0 2px}
+.cfg-toolvis-h:first-child{margin-top:0}
+.cfg-toolvis-row{padding:5px 5px;border-radius:7px}
+.cfg-toolvis-row:hover{background:var(--surface-2)}
+.cfg-toolvis-ic{display:inline-flex;width:18px;height:18px;color:var(--brand-dark);flex-shrink:0}
+.cfg-toolvis-ic svg{width:18px;height:18px;stroke:currentColor;fill:none}
+.cfg-toolvis-label{flex:1;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cfg-toolvis-row.is-locked .cfg-toolvis-label{color:var(--text-muted)}
+.cfg-toolvis-always{font-size:.66rem;color:var(--text-faint);font-style:italic;flex-shrink:0}
 @media(max-width:720px){.cfg-grid2{grid-template-columns:1fr}}
 .foot-mark{width:40px;height:40px;color:var(--brand);flex-shrink:0}
 .foot-mark svg{width:100%;height:100%}
@@ -1899,6 +1910,11 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
         </div>
 
         <div class="cfg-box">
+          <h3 class="tm-h">Tools in the menu</h3>
+          <div class="cfg-toolvis" id="cfgToolVis"></div>
+        </div>
+
+        <div class="cfg-box">
           <h3 class="tm-h">Configuration</h3>
           <p class="batch-desc" style="margin:0 0 10px;max-width:none">The live state of your build as JSON — links, text blocks, snippets, clocks, color and language. Edit it here or paste one in, then apply.</p>
           <div class="field">
@@ -2011,7 +2027,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev10 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev11 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -5334,8 +5350,27 @@ function cfgSyncTool(){
   if($('cfgBrand')) $('cfgBrand').value=(currentTheme?currentTheme.brand:'#0082B4');
   if($('cfgLockConf')) $('cfgLockConf').checked=lockConfidential;
   document.querySelectorAll('#cfgLangSeg button').forEach(b=>b.classList.toggle('active',b.dataset.l===phLang));
+  cfgRenderToolVis();
   updateCustomUI();
   cfgRefreshPreview();
+}
+/* Tools-in-the-menu editor: grouped show/hide toggles. Toggling updates HIDDEN +
+   live-rebuilds nav/home + marks the config customized (handler wired in initConfig). */
+function cfgRenderToolVis(){
+  const box=$('cfgToolVis'); if(!box) return;
+  const groups=[], byG={};
+  TOOLS.forEach(t=>{ const g=t.group||''; if(!(g in byG)){ byG[g]=[]; groups.push(g); } byG[g].push(t); });
+  box.innerHTML=groups.map(g=>
+    (g?'<div class="cfg-toolvis-h">'+esc(g)+'</div>':'')+
+    byG[g].map(t=>{
+      const locked=NAV_LOCKED.has(t.id), shown=!HIDDEN.has(t.id);
+      return '<label class="check cfg-toolvis-row'+(locked?' is-locked':'')+'">'+
+        '<input type="checkbox" data-tool="'+esc(t.id)+'"'+((locked||shown)?' checked':'')+(locked?' disabled':'')+'>'+
+        '<span class="cfg-toolvis-ic">'+t.icon+'</span><span class="cfg-toolvis-label">'+esc(t.label)+'</span>'+
+        (locked?'<span class="cfg-toolvis-always">always shown</span>':'')+
+        '</label>';
+    }).join('')
+  ).join('');
 }
 function initConfig(){
   /* read provenance baked into the file */
@@ -5371,6 +5406,13 @@ function initConfig(){
   $('cfgExport').addEventListener('click',cfgExport);
   $('cfgReset').addEventListener('click',()=>{ cfgResetToBaseline(); cfgSyncTool(); });
   $('cfgSaveHtml').addEventListener('click',saveHtml);
+  { const tv=$('cfgToolVis'); if(tv) tv.addEventListener('change',e=>{
+    const cb=e.target.closest('input[data-tool]'); if(!cb) return;
+    const id=cb.dataset.tool; if(NAV_LOCKED.has(id)) return;   /* locked rows are disabled; guard anyway */
+    if(cb.checked) HIDDEN.delete(id); else HIDDEN.add(id);
+    buildNav(); if(typeof renderHome==='function') renderHome();
+    if(typeof markCustom==='function') markCustom(cfgLabel);
+  }); }
   /* content tiles → jump to the page that edits that data */
   const ct=$('cfgContentTiles');
   if(ct){
