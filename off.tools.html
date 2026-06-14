@@ -961,6 +961,9 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 .sn-tosc{flex-shrink:0;opacity:.7}
 .sn-tosc:hover{opacity:1}
 .sn-item:hover .sn-copy,.sn-item:focus-within .sn-copy{opacity:1}
+/* Part C: copy-on-body-click — drop the desktop copy button; keep a small persistent glyph on mobile (no hover there) */
+.sn-copy{display:none}
+@media(max-width:560px){.sn-copy{display:flex;width:28px;height:28px}}
 .sn-tag{font-size:.68rem;color:var(--text-muted);background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:1px 8px}
 .sn-level{font-size:.58rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:5px;border:1px solid transparent;flex-shrink:0;white-space:nowrap}
 .lv-readonly{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-border)}
@@ -969,6 +972,10 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 .sn-levelseg{margin-top:-8px}
 .sn-body{font-family:var(--mono);font-size:.8rem;line-height:1.45;color:var(--text);background:var(--surface-2);border:0;border-left:2px solid var(--border-strong);border-radius:0 6px 6px 0;padding:7px 11px;margin:7px 0 0;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow:auto}
 .sn-item:hover .sn-body{border-left-color:var(--brand)}
+/* Part C: body is a click-to-copy target in view mode (pointer + subtle hover tint + green copied-flash). Suppressed while editing. */
+body:not(.editing) .sn-body{cursor:pointer}
+body:not(.editing) .sn-body:hover{background:var(--brand-tint-2)}
+body:not(.editing) .sn-body.done{border-left-color:var(--ok);background:var(--ok-bg)}
 .sn-cmt{color:var(--text-faint);font-style:italic}
 .sn-add{padding:0;overflow:hidden}
 .sn-add>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:11px;padding:15px 18px;font-family:var(--display);font-weight:600;font-size:.95rem;color:var(--text);user-select:none}
@@ -1972,7 +1979,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev3 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev4 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -4643,7 +4650,7 @@ function snCard(s,i,dnd){
           '<button class="sn-btn" data-act="edit" data-i="'+i+'" title="Edit snippet"><svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
           '<button class="sn-btn sn-del" data-act="del" data-i="'+i+'" title="Delete snippet"><svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>'+
         '</span></div>'+
-      '<pre class="sn-body">'+snHl(s.body)+'</pre>'+
+      '<pre class="sn-body" data-act="copybody" data-i="'+i+'" role="button" tabindex="0" title="Click to copy">'+snHl(s.body)+'</pre>'+
     '</div>';
 }
 function snVendorCount(v){ return SNIPPETS.filter(s=>snVendorValid(s.vendor)===v).length; }
@@ -4760,6 +4767,16 @@ function snDelete(i){
   if(snEditIdx===i) snFormReset(); else if(snEditIdx>i) snEditIdx--;
   snRender($('snSearch')?$('snSearch').value:'');
 }
+/* Part C: copy a snippet body from a view-mode click/Enter on its <pre>.
+   No-op while editing; a non-empty text selection inside the body wins, so the
+   user can select part of a command without triggering a whole-body copy. */
+function snCopyBody(el){
+  if(editing) return;
+  const i=+el.dataset.i, s=SNIPPETS[i]; if(!s) return;
+  const sel=window.getSelection?window.getSelection():null;
+  if(sel && !sel.isCollapsed && sel.toString().trim() && el.contains(sel.anchorNode)) return;
+  copyText(s.body,el,'Snippet copied');
+}
 function initSnippets(){
   snFillVendorSelect();
   /* open on the first vendor that actually has snippets */
@@ -4773,9 +4790,17 @@ function initSnippets(){
     const btn=e.target.closest('[data-act]'); if(!btn) return;
     const i=+btn.dataset.i, act=btn.dataset.act;
     if(act==='copy'){ const s=SNIPPETS[i]; if(s) copyText(s.body,btn,'Snippet copied'); }
+    else if(act==='copybody') snCopyBody(btn);
     else if(act==='toscript') snToScript(i);
     else if(act==='edit') snLoadForm(i);
     else if(act==='del') snDelete(i);
+  });
+  /* Part C: keyboard activation for the body click-to-copy target (role=button) */
+  $('snList').addEventListener('keydown',e=>{
+    if(editing) return;
+    if(e.key!=='Enter' && e.key!==' ') return;
+    const body=e.target.closest('.sn-body[data-act="copybody"]'); if(!body) return;
+    e.preventDefault(); snCopyBody(body);
   });
   makeReorderable({container:$('snList'),itemSel:'.sn-item',headerSel:'.sn-cat',axis:'y',getList:()=>SNIPPETS,onChange:()=>snRender($('snSearch')?$('snSearch').value:'')});
   snRender('');
