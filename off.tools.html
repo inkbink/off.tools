@@ -566,6 +566,8 @@ body.online .online-toggle .ot-dot{background:#eafff5;box-shadow:0 0 0 3px rgba(
 .faq-none{color:var(--text-muted);font-size:.9rem;margin-top:14px}
 /* ---------- Customize page: boxed sections, warning callout, content tiles ---------- */
 .cfg-box{border:1px solid var(--border);border-radius:12px;padding:15px 18px;margin-top:14px;background:var(--surface)}
+/* Customize wrapper is a layout container only — the .cfg-box cards carry the fill and separate on the page bg; .main supplies the outer gutter */
+#tool-customize>.card{background:transparent;border:0;box-shadow:none;border-radius:0;padding:0}
 /* hidden spectrum easter egg: barely-there sparkle by the accent control.
    It perks up on hover, and stays visible once the accent is on (so you can
    find it again to switch it off). */
@@ -575,7 +577,12 @@ body.online .online-toggle .ot-dot{background:#eafff5;box-shadow:0 0 0 3px rgba(
 body.spectrum .cfg-egg{opacity:.7;color:var(--brand)}
 .cfg-egg-row{display:flex;justify-content:flex-end;margin-top:10px}
 .cfg-lock{font-size:.95rem;font-weight:600;color:var(--text);gap:11px}
-.cfg-lock-box{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.cfg-lock-box{display:flex;flex-direction:column;gap:10px}
+.cfg-lock-row{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.cfg-lock-learn{display:inline-flex;align-items:center;gap:8px;background:none;border:0;cursor:pointer;font:inherit;font-size:.82rem;color:var(--brand-dark);padding:2px 0}
+.cfg-lock-learn:hover{color:var(--brand)}
+.cfg-lock-learn .chev{width:8px;height:8px;flex-shrink:0;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .18s}
+.cfg-lock-learn[aria-expanded="true"] .chev{transform:rotate(45deg)}
 /* Collapsible Customize sub-sections (tool-menu editor, lock "how it works") — chevron idiom shared with the FAQ */
 .cfg-collapse>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;user-select:none;font-family:var(--display);font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint)}
 .cfg-collapse>summary::-webkit-details-marker{display:none}
@@ -1908,11 +1915,11 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
         </div>
 
         <div class="cfg-box cfg-lock-box">
-          <label class="check cfg-lock"><input type="checkbox" id="cfgLockConf"> <span class="cfg-lock-t">Lock Confidential Link addresses</span></label>
-          <details class="cfg-collapse">
-            <summary>How it works<span class="chev"></span></summary>
-            <div class="cfg-collapse-body"><p>It's a <strong>Customize</strong> toggle (on by default) for a build you keep on a shared drive. With it on, a link classed <strong>Confidential</strong> never has its address written into the file: the saved HTML, an exported config and the JSON preview all keep only <code>https://</code> for those links — so the address isn't sitting in the file or crossing the network when someone opens it from the share. Clicking such a link asks you for the address once, opens it in a new tab, and keeps it <strong>in memory for the session</strong> so the next click just works; it's gone on reload and never written to disk. Two limits worth knowing: it protects the <em>address</em> only — a link's title, description and tags are still saved as cleartext, so keep nothing secret in those — and the prompt isn't a password (it simply opens an address you already know). Making the shared file itself read-only is a permission you set on the share, not something off.tools can enforce.</p></div>
-          </details>
+          <div class="cfg-lock-row">
+            <label class="check cfg-lock"><input type="checkbox" id="cfgLockConf"> <span class="cfg-lock-t">Lock Confidential Link addresses</span></label>
+            <button type="button" class="cfg-lock-learn" id="cfgLockLearn" aria-expanded="false" aria-controls="cfgLockHow">How it works<span class="chev"></span></button>
+          </div>
+          <div class="cfg-collapse-body" id="cfgLockHow" hidden><p>It's a <strong>Customize</strong> toggle (on by default) for a build you keep on a shared drive. With it on, a link classed <strong>Confidential</strong> never has its address written into the file: the saved HTML, an exported config and the JSON preview all keep only <code>https://</code> for those links — so the address isn't sitting in the file or crossing the network when someone opens it from the share. Clicking such a link asks you for the address once, opens it in a new tab, and keeps it <strong>in memory for the session</strong> so the next click just works; it's gone on reload and never written to disk. Two limits worth knowing: it protects the <em>address</em> only — a link's title, description and tags are still saved as cleartext, so keep nothing secret in those — and the prompt isn't a password (it simply opens an address you already know). Making the shared file itself read-only is a permission you set on the share, not something off.tools can enforce.</p></div>
         </div>
 
         <div class="cfg-box">
@@ -2035,7 +2042,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev12 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev13 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -5409,6 +5416,7 @@ function initConfig(){
   $('cfgColorReset').addEventListener('click',()=>{ clearTheme(); $('cfgBrand').value='#0082B4'; updateCustomUI(); cfgRefreshPreview(); });
   { const egg=$('cfgSpectrumEgg'); if(egg) egg.addEventListener('click',toggleSpectrum); }
   { const lc=$('cfgLockConf'); if(lc) lc.addEventListener('change',e=>{ lockConfidential=e.target.checked; markCustom(cfgLabel); if(typeof dashSyncLock==='function') dashSyncLock(); renderDash($('dashSearch')?$('dashSearch').value:''); if(typeof renderHomeLinks==='function') renderHomeLinks(); cfgRefreshPreview(); }); }
+  { const ll=$('cfgLockLearn'); if(ll) ll.addEventListener('click',()=>{ const open=ll.getAttribute('aria-expanded')==='true'; ll.setAttribute('aria-expanded',open?'false':'true'); const body=$('cfgLockHow'); if(body) body.hidden=open; }); }   /* toggles the inline explanation; no longer jumps to the FAQ */
   $('cfgApply').addEventListener('click',()=>cfgImportText($('cfgPaste').value));
   $('cfgExport').addEventListener('click',cfgExport);
   $('cfgReset').addEventListener('click',()=>{ cfgResetToBaseline(); cfgSyncTool(); });
