@@ -1966,7 +1966,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev1 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev2 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -2034,6 +2034,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
   {"cat":"Vendor docs","title":"WatchGuard","url":"https://www.watchguard.com/wgrd-help/documentation","desc":"Firebox & Fireware documentation","class":"public","tags":["watchguard","firebox","fireware","docs"],"onHome":false},
   {"cat":"Vendor docs","title":"MikroTik","url":"https://help.mikrotik.com/docs/","desc":"RouterOS & MikroTik documentation","class":"public","tags":["mikrotik","routeros","docs","vendor"]},
   {"cat":"Vendor docs","title":"Netgate / pfSense","url":"https://docs.netgate.com","desc":"pfSense & TNSR firewall documentation","class":"public","tags":["pfsense","netgate","firewall","docs"],"onHome":false},
+  {"cat":"Vendor docs","title":"F5 BIG-IP","url":"https://techdocs.f5.com","desc":"BIG-IP ADC & TMOS documentation","class":"public","tags":["f5","bigip","adc","docs","vendor"],"onHome":false},
 
   {"cat":"Break room","title":"IMDb","url":"https://www.imdb.com","desc":"Films, series & ratings","class":"public","tags":["imdb","film","tv","ratings"],"onHome":false},
   {"cat":"Break room","title":"xkcd","url":"https://xkcd.com","desc":"Comics for the technically inclined","class":"public","tags":["xkcd","comics","fun"],"onHome":false}
@@ -2133,61 +2134,61 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
 
 <script type="application/json" id="snippetsData">
 [
- {"vendor":"cisco","cat":"Cisco IOS","title":"Save running config","body":"copy running-config startup-config","tags":["cisco","save"]},
- {"vendor":"cisco","cat":"Cisco IOS — Read-only","title":"Show interface status","body":"show interface status","tags":["cisco","interface","status","readonly"]},
- {"vendor":"cisco","cat":"Cisco IOS — Read-only","title":"Show VLAN brief","body":"show vlan brief","tags":["cisco","vlan","readonly"]},
- {"vendor":"cisco","cat":"Cisco IOS — Read-only","title":"Show running-config","body":"show running-config","tags":["cisco","config","readonly"]},
- {"vendor":"cisco","cat":"Cisco IOS — Read-only","title":"Find a MAC in the address-table","body":"show mac address-table | include <MAC-ADDRESS>","tags":["cisco","mac","address-table","readonly"]},
- {"vendor":"cisco","cat":"Cisco IOS — Read-only","title":"Show full MAC address-table","body":"show mac address-table","tags":["cisco","mac","address-table","readonly"]},
- {"vendor":"cisco","cat":"Cisco IOS — Read-only","title":"Show interface description","body":"show interfaces description","tags":["cisco","interface","readonly"]},
- {"vendor":"cisco","cat":"Cisco IOS","title":"Bounce an interface","body":"interface Gi1/0/9\n shutdown\n no shutdown\nend","tags":["cisco","interface"]},
- {"vendor":"linux","cat":"Capture","title":"Capture to pcap file","body":"tcpdump -ni eth0 -w /tmp/capture.pcap host 10.0.0.1 and port 443","tags":["linux","tcpdump","capture"]},
- {"vendor":"linux","cat":"Diagnostics","title":"Listening sockets + process","body":"ss -tulpn","tags":["linux","ports"]},
- {"vendor":"barracuda","cat":"Logs","title":"Follow firewall activity log","body":"tail -f /var/phion/logs/box_Firewall_Activity","tags":["barracuda","logs"]},
- {"vendor":"windows","cat":"Networking","title":"Reset the network stack","body":"ipconfig /flushdns\nnetsh winsock reset\nnetsh int ip reset","tags":["windows","dns","reset"]},
- {"vendor":"other","cat":"SSH","title":"Generate an ed25519 key","body":"ssh-keygen -t ed25519 -C \"you@example.com\"","tags":["ssh","keys"]},
+ {"vendor":"cisco","cat":"Cisco IOS","title":"Save running config","body":"copy running-config startup-config","tags":["cisco","save"],"level":"admin"},
+ {"vendor":"cisco","cat":"Cisco IOS","title":"Show interface status","body":"show interface status","tags":["cisco","interface","status"],"level":"readonly"},
+ {"vendor":"cisco","cat":"Cisco IOS","title":"Show VLAN brief","body":"show vlan brief","tags":["cisco","vlan"],"level":"readonly"},
+ {"vendor":"cisco","cat":"Cisco IOS","title":"Show running-config","body":"show running-config","tags":["cisco","config"],"level":"readonly"},
+ {"vendor":"cisco","cat":"Cisco IOS","title":"Find a MAC in the address-table","body":"show mac address-table | include <MAC-ADDRESS>","tags":["cisco","mac","address-table"],"level":"readonly"},
+ {"vendor":"cisco","cat":"Cisco IOS","title":"Show full MAC address-table","body":"show mac address-table","tags":["cisco","mac","address-table"],"level":"readonly"},
+ {"vendor":"cisco","cat":"Cisco IOS","title":"Show interface description","body":"show interfaces description","tags":["cisco","interface"],"level":"readonly"},
+ {"vendor":"cisco","cat":"Cisco IOS","title":"Bounce an interface","body":"interface Gi1/0/9\n shutdown\n no shutdown\nend","tags":["cisco","interface"],"level":"admin"},
+ {"vendor":"linux","cat":"Capture","title":"Capture to pcap file","body":"tcpdump -ni eth0 -w /tmp/capture.pcap host 10.0.0.1 and port 443","tags":["linux","tcpdump","capture"],"level":"admin"},
+ {"vendor":"linux","cat":"Diagnostics","title":"Listening sockets + process","body":"ss -tulpn","tags":["linux","ports"],"level":"readonly"},
+ {"vendor":"barracuda","cat":"Logs","title":"Follow firewall activity log","body":"tail -f /var/phion/logs/box_Firewall_Activity","tags":["barracuda","logs"],"level":"readonly"},
+ {"vendor":"windows","cat":"Networking","title":"Reset the network stack","body":"ipconfig /flushdns\nnetsh winsock reset\nnetsh int ip reset","tags":["windows","dns","reset"],"level":"admin"},
+ {"vendor":"other","cat":"SSH","title":"Generate an ed25519 key","body":"ssh-keygen -t ed25519 -C \"you@example.com\"","tags":["ssh","keys"],"level":"admin"},
 
- {"vendor":"barracuda","cat":"Logs","title":"Grep firewall activity logs for an IP","body":"cd /phion0/logs/\ncat box_Firewall_Activity* | grep \"<IP-ADDRESS>\"","tags":["barracuda","logs","grep","firewall"]},
- {"vendor":"barracuda","cat":"Logs","title":"Grep firewall logs for blocked traffic from an IP","body":"grep \"<IP>\" box_Firewall_Activity.* | grep \"Block\"","tags":["barracuda","logs","grep","block"]},
- {"vendor":"barracuda","cat":"Logs","title":"Grep firewall logs for two IPs (OR)","body":"grep -e \"<IP-1>\" -e \"<IP-2>\" box_Firewall_Activity.*","tags":["barracuda","logs","grep"]},
- {"vendor":"barracuda","cat":"Logs","title":"Grep firewall logs for a site-to-site tunnel","body":"cat box_Firewall_Activity.* | grep \"<TUNNEL-NAME>\"","tags":["barracuda","logs","grep","vpn","site-to-site"]},
+ {"vendor":"barracuda","cat":"Logs","title":"Grep firewall activity logs for an IP","body":"cd /phion0/logs/\ncat box_Firewall_Activity* | grep \"<IP-ADDRESS>\"","tags":["barracuda","logs","grep","firewall"],"level":"readonly"},
+ {"vendor":"barracuda","cat":"Logs","title":"Grep firewall logs for blocked traffic from an IP","body":"grep \"<IP>\" box_Firewall_Activity.* | grep \"Block\"","tags":["barracuda","logs","grep","block"],"level":"readonly"},
+ {"vendor":"barracuda","cat":"Logs","title":"Grep firewall logs for two IPs (OR)","body":"grep -e \"<IP-1>\" -e \"<IP-2>\" box_Firewall_Activity.*","tags":["barracuda","logs","grep"],"level":"readonly"},
+ {"vendor":"barracuda","cat":"Logs","title":"Grep firewall logs for a site-to-site tunnel","body":"cat box_Firewall_Activity.* | grep \"<TUNNEL-NAME>\"","tags":["barracuda","logs","grep","vpn","site-to-site"],"level":"readonly"},
 
- {"vendor":"barracuda","cat":"Logs — Cleanup","title":"DESTRUCTIVE: delete today's firewall activity logs","body":"# DESTRUCTIVE — permanently deletes matching log files. Review the match first.\ncd /phion0/logs/\nfind /phion0/logs/box_Firewall_Activity* -mtime +0 -exec rm -f {} \\;","tags":["barracuda","logs","cleanup","destructive"]},
- {"vendor":"barracuda","cat":"Logs — Cleanup","title":"DESTRUCTIVE: delete old logs / stat files (older than N days)","body":"# DESTRUCTIVE — permanently deletes matching files. Review the match first.\n# Logs live under /phion0/logs, statistics under /var/phion/stat.\nfind <DIR> -mtime +<DAYS> -exec rm -f {} \\;","tags":["barracuda","logs","stat","cleanup","destructive"]},
+ {"vendor":"barracuda","cat":"Logs","title":"DESTRUCTIVE: delete today's firewall activity logs","body":"# DESTRUCTIVE — permanently deletes matching log files. Review the match first.\ncd /phion0/logs/\nfind /phion0/logs/box_Firewall_Activity* -mtime +0 -exec rm -f {} \\;","tags":["barracuda","logs","cleanup"],"level":"root"},
+ {"vendor":"barracuda","cat":"Logs","title":"DESTRUCTIVE: delete old logs / stat files (older than N days)","body":"# DESTRUCTIVE — permanently deletes matching files. Review the match first.\n# Logs live under /phion0/logs, statistics under /var/phion/stat.\nfind <DIR> -mtime +<DAYS> -exec rm -f {} \\;","tags":["barracuda","logs","stat","cleanup"],"level":"root"},
 
- {"vendor":"barracuda","cat":"Disk & Storage","title":"Disk usage (human-readable)","body":"df -h","tags":["barracuda","disk","df"]},
- {"vendor":"barracuda","cat":"Disk & Storage","title":"Per-box stat directory size","body":"du -cksh /phion0/stat/1/box/*","tags":["barracuda","disk","du","stat"]},
- {"vendor":"barracuda","cat":"Disk & Storage","title":"Top-level usage under /phion0","body":"du -cksh /phion0/*","tags":["barracuda","disk","du"]},
- {"vendor":"barracuda","cat":"Disk & Storage","title":"Directory usage, one level deep","body":"du -h --max-depth=1","tags":["barracuda","disk","du"]},
- {"vendor":"barracuda","cat":"Disk & Storage","title":"DESTRUCTIVE: surface scan a partition for bad blocks","body":"# DESTRUCTIVE/RISKY — read-only by default, but heavy I/O. Never use the\n# write-test (-w) variant on a partition that holds data: it erases it.\nbadblocks -s -vvv /dev/<PARTITION>","tags":["barracuda","disk","badblocks","destructive"]},
- {"vendor":"barracuda","cat":"Disk & Storage","title":"SMART short self-test","body":"smartctl -t short /dev/sda","tags":["barracuda","disk","smart","smartctl"]},
- {"vendor":"barracuda","cat":"Disk & Storage","title":"SMART full attribute report","body":"smartctl -a /dev/sda","tags":["barracuda","disk","smart","smartctl"]},
+ {"vendor":"barracuda","cat":"Disk & Storage","title":"Disk usage (human-readable)","body":"df -h","tags":["barracuda","disk","df"],"level":"readonly"},
+ {"vendor":"barracuda","cat":"Disk & Storage","title":"Per-box stat directory size","body":"du -cksh /phion0/stat/1/box/*","tags":["barracuda","disk","du","stat"],"level":"readonly"},
+ {"vendor":"barracuda","cat":"Disk & Storage","title":"Top-level usage under /phion0","body":"du -cksh /phion0/*","tags":["barracuda","disk","du"],"level":"readonly"},
+ {"vendor":"barracuda","cat":"Disk & Storage","title":"Directory usage, one level deep","body":"du -h --max-depth=1","tags":["barracuda","disk","du"],"level":"readonly"},
+ {"vendor":"barracuda","cat":"Disk & Storage","title":"DESTRUCTIVE: surface scan a partition for bad blocks","body":"# DESTRUCTIVE/RISKY — read-only by default, but heavy I/O. Never use the\n# write-test (-w) variant on a partition that holds data: it erases it.\nbadblocks -s -vvv /dev/<PARTITION>","tags":["barracuda","disk","badblocks"],"level":"root"},
+ {"vendor":"barracuda","cat":"Disk & Storage","title":"SMART short self-test","body":"smartctl -t short /dev/sda","tags":["barracuda","disk","smart","smartctl"],"level":"admin"},
+ {"vendor":"barracuda","cat":"Disk & Storage","title":"SMART full attribute report","body":"smartctl -a /dev/sda","tags":["barracuda","disk","smart","smartctl"],"level":"readonly"},
 
- {"vendor":"barracuda","cat":"Interfaces","title":"Show interface link (ethtool)","body":"ethtool p3","tags":["barracuda","interface","ethtool"]},
- {"vendor":"barracuda","cat":"Interfaces","title":"Show interface (ifconfig)","body":"ifconfig p3","tags":["barracuda","interface","ifconfig"]},
- {"vendor":"barracuda","cat":"Interfaces","title":"Bring an interface down","body":"# Disruptive — drops the link on this interface.\nifconfig p3 down","tags":["barracuda","interface","ifconfig"]},
- {"vendor":"barracuda","cat":"Interfaces","title":"Bring an interface up","body":"ifconfig p3 up","tags":["barracuda","interface","ifconfig"]},
- {"vendor":"barracuda","cat":"Interfaces","title":"Enable autonegotiation","body":"ethtool -s p3 autoneg on","tags":["barracuda","interface","ethtool","autoneg"]},
- {"vendor":"barracuda","cat":"Interfaces","title":"Fix link speed/duplex (autoneg off)","body":"# Disruptive — link will briefly drop. Both ends must match.\nethtool -s p3 autoneg off speed <SPEED> duplex full","tags":["barracuda","interface","ethtool","duplex"]},
+ {"vendor":"barracuda","cat":"Interfaces","title":"Show interface link (ethtool)","body":"ethtool p3","tags":["barracuda","interface","ethtool"],"level":"readonly"},
+ {"vendor":"barracuda","cat":"Interfaces","title":"Show interface (ifconfig)","body":"ifconfig p3","tags":["barracuda","interface","ifconfig"],"level":"readonly"},
+ {"vendor":"barracuda","cat":"Interfaces","title":"Bring an interface down","body":"# Disruptive — drops the link on this interface.\nifconfig p3 down","tags":["barracuda","interface","ifconfig"],"level":"admin"},
+ {"vendor":"barracuda","cat":"Interfaces","title":"Bring an interface up","body":"ifconfig p3 up","tags":["barracuda","interface","ifconfig"],"level":"admin"},
+ {"vendor":"barracuda","cat":"Interfaces","title":"Enable autonegotiation","body":"ethtool -s p3 autoneg on","tags":["barracuda","interface","ethtool","autoneg"],"level":"admin"},
+ {"vendor":"barracuda","cat":"Interfaces","title":"Fix link speed/duplex (autoneg off)","body":"# Disruptive — link will briefly drop. Both ends must match.\nethtool -s p3 autoneg off speed <SPEED> duplex full","tags":["barracuda","interface","ethtool","duplex"],"level":"admin"},
 
- {"vendor":"barracuda","cat":"Connectivity Tests","title":"Speedtest from a specific source IP","body":"speedtest --source <SOURCE-IP>","tags":["barracuda","speedtest","connectivity"]},
- {"vendor":"barracuda","cat":"Connectivity Tests","title":"Show egress public IP (Akamai, via source IP)","body":"curl -L --interface <SOURCE-IP> http://whatismyip.akamai.com/","tags":["barracuda","curl","publicip","connectivity"]},
- {"vendor":"barracuda","cat":"Connectivity Tests","title":"Show egress public IP (ipconfig.cc, via source IP)","body":"curl -L --interface <SOURCE-IP> https://ipconfig.cc","tags":["barracuda","curl","publicip","connectivity"]},
+ {"vendor":"barracuda","cat":"Connectivity Tests","title":"Speedtest from a specific source IP","body":"speedtest --source <SOURCE-IP>","tags":["barracuda","speedtest","connectivity"],"level":"readonly"},
+ {"vendor":"barracuda","cat":"Connectivity Tests","title":"Show egress public IP (Akamai, via source IP)","body":"curl -L --interface <SOURCE-IP> http://whatismyip.akamai.com/","tags":["barracuda","curl","publicip","connectivity"],"level":"readonly"},
+ {"vendor":"barracuda","cat":"Connectivity Tests","title":"Show egress public IP (ipconfig.cc, via source IP)","body":"curl -L --interface <SOURCE-IP> https://ipconfig.cc","tags":["barracuda","curl","publicip","connectivity"],"level":"readonly"},
 
- {"vendor":"barracuda","cat":"File Transfer","title":"Copy a file to a host via scp","body":"scp <FILE> root@<DST-IP>:/tmp/","tags":["barracuda","scp","transfer"]},
- {"vendor":"barracuda","cat":"File Transfer","title":"scp from a specific source IP (BindAddress)","body":"scp -o BindAddress=<SRC-IP> <FILE> root@<DST-IP>:/tmp/","tags":["barracuda","scp","transfer"]},
+ {"vendor":"barracuda","cat":"File Transfer","title":"Copy a file to a host via scp","body":"scp <FILE> root@<DST-IP>:/tmp/","tags":["barracuda","scp","transfer"],"level":"admin"},
+ {"vendor":"barracuda","cat":"File Transfer","title":"scp from a specific source IP (BindAddress)","body":"scp -o BindAddress=<SRC-IP> <FILE> root@<DST-IP>:/tmp/","tags":["barracuda","scp","transfer"],"level":"admin"},
 
- {"vendor":"barracuda","cat":"VPN","title":"Stop the next-gen VPN service (vpnc3)","body":"# Disruptive — stops VPN tunnels handled by vpnc3.\nvpnc3 stop","tags":["barracuda","vpn","vpnc3"]},
- {"vendor":"barracuda","cat":"VPN","title":"DESTRUCTIVE: remove cached fast VPN config","body":"# DESTRUCTIVE — deletes the cached VPN fast-config. Only do this when\n# instructed for troubleshooting; it is rebuilt on next config push.\nrm -rf /opt/phion/run/vpncfast.conf","tags":["barracuda","vpn","destructive"]},
+ {"vendor":"barracuda","cat":"VPN","title":"Stop the next-gen VPN service (vpnc3)","body":"# Disruptive — stops VPN tunnels handled by vpnc3.\nvpnc3 stop","tags":["barracuda","vpn","vpnc3"],"level":"admin"},
+ {"vendor":"barracuda","cat":"VPN","title":"DESTRUCTIVE: remove cached fast VPN config","body":"# DESTRUCTIVE — deletes the cached VPN fast-config. Only do this when\n# instructed for troubleshooting; it is rebuilt on next config push.\nrm -rf /opt/phion/run/vpncfast.conf","tags":["barracuda","vpn"],"level":"root"},
 
- {"vendor":"barracuda","cat":"Updates","title":"Apply pending box update (phionUpdate)","body":"# Disruptive — applies an update package; may restart services / reboot.\ncd /var/phion/packages/\nphionUpdate","tags":["barracuda","update","phionupdate"]},
+ {"vendor":"barracuda","cat":"Updates","title":"Apply pending box update (phionUpdate)","body":"# Disruptive — applies an update package; may restart services / reboot.\ncd /var/phion/packages/\nphionUpdate","tags":["barracuda","update","phionupdate"],"level":"admin"},
 
- {"vendor":"barracuda","cat":"Services & Processes","title":"Restart the VPN server module","body":"# Disruptive — drops VPN tunnels while the module restarts.\n/opt/phion/bin/phionctrl module restart vpnserver","tags":["barracuda","phionctrl","vpn","restart"]},
- {"vendor":"barracuda","cat":"Subsystem","title":"Shut down the subsystem","body":"# Disruptive — stops all servers and services on the box.\n/opt/phion/bin/phionctrl shutdown","tags":["barracuda","phionctrl","subsystem","shutdown"]},
- {"vendor":"barracuda","cat":"Subsystem","title":"Start the subsystem","body":"/opt/phion/bin/phionctrl startup","tags":["barracuda","phionctrl","subsystem","startup"]},
- {"vendor":"barracuda","cat":"Subsystem","title":"Reboot the box","body":"# Disruptive — reboots the entire appliance.\n/opt/phion/bin/phionctrl reboot","tags":["barracuda","phionctrl","subsystem","reboot"]},
+ {"vendor":"barracuda","cat":"Services & Processes","title":"Restart the VPN server module","body":"# Disruptive — drops VPN tunnels while the module restarts.\n/opt/phion/bin/phionctrl module restart vpnserver","tags":["barracuda","phionctrl","vpn","restart"],"level":"admin"},
+ {"vendor":"barracuda","cat":"Subsystem","title":"Shut down the subsystem","body":"# Disruptive — stops all servers and services on the box.\n/opt/phion/bin/phionctrl shutdown","tags":["barracuda","phionctrl","subsystem","shutdown"],"level":"admin"},
+ {"vendor":"barracuda","cat":"Subsystem","title":"Start the subsystem","body":"/opt/phion/bin/phionctrl startup","tags":["barracuda","phionctrl","subsystem","startup"],"level":"admin"},
+ {"vendor":"barracuda","cat":"Subsystem","title":"Reboot the box","body":"# Disruptive — reboots the entire appliance.\n/opt/phion/bin/phionctrl reboot","tags":["barracuda","phionctrl","subsystem","reboot"],"level":"admin"},
 
- {"vendor":"barracuda","cat":"Maintenance","title":"DESTRUCTIVE: clear the event database","body":"# DESTRUCTIVE — deletes the event database. All stored events are lost;\n# it is recreated empty. Only for recovering a corrupted eventd.db.\nrm -f /var/phion/event/eventd.db","tags":["barracuda","event","cleanup","destructive"]}
+ {"vendor":"barracuda","cat":"Maintenance","title":"DESTRUCTIVE: clear the event database","body":"# DESTRUCTIVE — deletes the event database. All stored events are lost;\n# it is recreated empty. Only for recovering a corrupted eventd.db.\nrm -f /var/phion/event/eventd.db","tags":["barracuda","event","cleanup"],"level":"root"}
 ]
 </script>
 
@@ -5085,6 +5086,10 @@ function buildConfig(){
 /* Anti-DoS: generous upper bounds on imported array sizes — never reached in
    real use, but they keep a maliciously huge config from freezing the tab. */
 const IMPORT_CAP={links:2000,snippets:2000,phrases:2000,clocks:1000,vendors:200};
+/* Snippet privilege levels — allowlist for import sanitization. Unknown or
+   missing → admin: never silently mark an unclassified command as safe readonly. */
+const SNIP_LEVELS=['readonly','admin','root'];
+function validLevel(v){ return SNIP_LEVELS.includes(v)?v:'admin'; }
 /* Byte ceiling for any raw JSON a user pastes or imports (config box, config
    file picker, AI-phrase import, Manage-links editor). 10 MB is far beyond any
    real config (~3 orders of magnitude over typical) yet parses in ~0.1 s — the
@@ -5136,6 +5141,7 @@ function applyConfig(cfg,opts){
       if(!title && !body.trim()) return null;
       const o={vendor:(typeof snVendorValid==='function'?snVendorValid(s.vendor):(s.vendor||'other')),cat:String(s.cat||'Snippets'),title:title||'Untitled',body};
       if(Array.isArray(s.tags)){ const t=s.tags.map(x=>String(x).trim()).filter(Boolean).slice(0,12); if(t.length) o.tags=t; }
+      o.level=validLevel(s.level);
       return o;
     }).filter(Boolean).slice(0,IMPORT_CAP.snippets);
     if(typeof snRender==='function') snRender($('snSearch')?$('snSearch').value:''); if(typeof snSyncVendorUI==='function') snSyncVendorUI(); touched=true;
