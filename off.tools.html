@@ -992,8 +992,12 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 /* ---------- Snippet Vault ---------- */
 .seg-n{display:inline-block;min-width:15px;padding:0 4px;margin-left:3px;font-size:.66rem;line-height:15px;text-align:center;border-radius:8px;background:var(--border);color:var(--text-muted)}
 .seg button.active .seg-n{background:rgba(255,255,255,.28);color:#fff}
-.sn-cat{font-family:var(--display);font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--text-faint);margin:16px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.sn-cat{font-family:var(--display);font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--text-faint);margin:0 0 9px;padding-left:2px}
 .sn-cat:first-child{margin-top:0}
+/* dev16: each category is its own soft grey tray — the tray separation replaces the old grey underline under the header */
+.sn-catbox{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:10px 11px;margin-bottom:14px}
+.sn-catbox:last-child{margin-bottom:0}
+.sn-catbox .sn-item:last-child{margin-bottom:0}
 .sn-item{border:1px solid var(--border-strong);border-radius:9px;padding:8px 10px 9px;margin-bottom:6px;background:var(--surface);box-shadow:var(--shadow-sm);transition:border-color .14s,box-shadow .14s,transform .14s}
 .sn-item:hover{border-color:var(--brand);box-shadow:var(--shadow-md);transform:translateY(-2px)}
 .sn-head{display:flex;align-items:center;gap:8px}
@@ -1027,6 +1031,10 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 .sn-levelseg .fpill[data-l="readonly"]{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-border)}
 .sn-levelseg .fpill[data-l="admin"]{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-border)}
 .sn-levelseg .fpill[data-l="root"]{color:var(--del);background:var(--del-bg);border-color:var(--del-border)}
+/* dev16: vendor pills + level filter share one row — vendor left (grows), level right; wraps to two lines when narrow */
+.sn-filterbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:18px}
+.sn-filterbar #snVendorSeg{flex:1 1 auto;margin-bottom:0}
+.sn-filterbar .sn-levelseg{flex:0 0 auto;margin-top:0;margin-bottom:0}
 .sn-body{font-family:var(--mono);font-size:.8rem;line-height:1.45;color:var(--text);background:var(--surface-2);border:0;border-left:2px solid var(--border-strong);border-radius:0 6px 6px 0;padding:7px 11px;margin:7px 0 0;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow:auto}
 .sn-item:hover .sn-body{border-left-color:var(--brand)}
 /* Part C: body is a click-to-copy target in view mode (pointer + subtle hover tint + green copied-flash). Suppressed while editing. */
@@ -1725,8 +1733,10 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
           <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
           <input type="text" id="snSearch" placeholder="Search within this vendor — title, body, tag, category …" spellcheck="false" autocomplete="off">
         </div>
-        <div class="cli-vendors" id="snVendorSeg"></div>
-        <div class="cli-vendors sn-levelseg" id="snLevelSeg"></div>
+        <div class="sn-filterbar">
+          <div class="cli-vendors" id="snVendorSeg"></div>
+          <div class="cli-vendors sn-levelseg" id="snLevelSeg"></div>
+        </div>
       </div>
       <div class="card">
         <div id="snList"></div>
@@ -2051,7 +2061,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev15 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev16 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -4875,7 +4885,7 @@ function snRender(filter){
   const cats=[],byC={};
   list.forEach(o=>{const c=o.s.cat||'Snippets';if(!byC[c]){byC[c]=[];cats.push(c);}byC[c].push(o);});
   const dnd=!q;
-  el.innerHTML=cats.map(c=>'<div class="sn-cat" data-cat="'+esc(c)+'">'+esc(c)+'</div>'+byC[c].map(o=>snCard(o.s,o.i,dnd)).join('')).join('');
+  el.innerHTML=cats.map(c=>'<div class="sn-catbox" data-cat="'+esc(c)+'"><div class="sn-cat" data-cat="'+esc(c)+'">'+esc(c)+'</div>'+byC[c].map(o=>snCard(o.s,o.i,dnd)).join('')+'</div>').join('');
 }
 function snFormReset(){ snEditIdx=-1; ['snCat','snTitle','snTags','snBody'].forEach(id=>{if($(id))$(id).value='';}); if($('snVendor'))$('snVendor').value=snVendorSel; if($('snLevel'))$('snLevel').value='admin'; $('snAdd').textContent='Add snippet'; $('snFormTitle').textContent='Add a snippet'; $('snCancel').style.display='none'; if($('snAddCard'))$('snAddCard').open=false; }
 function snLoadForm(i){
