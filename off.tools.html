@@ -176,12 +176,13 @@ body.spectrum .nav-item.active::before{background:hsl(var(--spec-h,205) 72% 46%)
 .page-head h1{font-family:var(--display);font-weight:700;font-size:1.62rem;letter-spacing:-.01em;color:var(--brand-dark)}
 .page-head p{color:var(--text-muted);font-size:.92rem;margin-top:3px}
 /* discreet Edit toggle (customizable pages only) */
-.edit-toggle{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 13px;border-radius:18px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text-muted);font:inherit;font-family:var(--display);font-weight:600;font-size:.8rem;cursor:pointer;transition:color .14s,border-color .14s,background .14s}
-.edit-toggle:hover{border-color:var(--brand);color:var(--brand-dark)}
+.edit-toggle{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;border-radius:16px;border:1px solid var(--border-strong);background:transparent;color:var(--text-muted);cursor:pointer;transition:color .14s,border-color .14s,background .14s}
+.edit-toggle:hover{border-color:var(--brand);color:var(--brand-dark);background:var(--brand-tint)}
 .edit-toggle .edit-toggle-ic{display:inline-flex;width:15px;height:15px}
 .edit-toggle .edit-toggle-ic svg{width:15px;height:15px;stroke:currentColor;fill:none}
+.edit-toggle .edit-toggle-t{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .edit-toggle.on{background:var(--brand);border-color:var(--brand);color:#fff}
-.edit-toggle.on:hover{background:var(--brand-dark);color:#fff}
+.edit-toggle.on:hover{background:var(--brand-dark);border-color:var(--brand-dark);color:#fff}
 /* view mode (default): hide inline edit affordances until Edit is on */
 body:not(.editing) .sn-add,
 body:not(.editing) .link-acts,
@@ -1112,7 +1113,7 @@ body:not(.editing) .sn-body.done{border-left-color:var(--ok);background:var(--ok
         <h1 id="pageTitle"></h1>
         <p id="pageSub"></p>
       </div>
-      <button class="edit-toggle" id="editToggle" type="button" aria-pressed="false" style="display:none"><span class="edit-toggle-ic"></span><span class="edit-toggle-t">Edit</span></button>
+      <button class="edit-toggle" id="editToggle" type="button" aria-pressed="false" aria-label="Edit" style="display:none"><span class="edit-toggle-ic"></span><span class="edit-toggle-t">Edit</span></button>
     </div>
 
     <!-- ============ TOOL: Start / Homepage ============ -->
@@ -1988,7 +1989,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev7 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev8 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -2777,6 +2778,7 @@ function setEditing(on){
   if(b){
     b.classList.toggle('on',editing);
     b.setAttribute('aria-pressed',editing?'true':'false');
+    b.setAttribute('aria-label',editing?'Done editing':'Edit');
     const ic=b.querySelector('.edit-toggle-ic'), t=b.querySelector('.edit-toggle-t');
     if(ic) ic.innerHTML=editing?ED_CHECK:ED_PENCIL;
     if(t) t.textContent=editing?'Done':'Edit';
@@ -4472,7 +4474,7 @@ const HOME_DEFAULT={
   sub:'off.tools is a **single HTML file** — and you\'re looking at all of it right now. Whether you browsed to off.tools or opened it from a disk, a USB stick or a network share: this one page is the entire app. No install, no server, no accounts, no cookies, nothing to set up.\n\nIt\'s built from plain **HTML, CSS and vanilla JavaScript** — no framework, no build step, no dependencies, no storage. Every tool runs **locally** in your browser tab and keeps nothing: whatever you type is gone the moment you reload. Nothing leaves your machine unless you run a one-off **link check**, which briefly asks the sites on the Link Board whether they respond.\n\nUse it here whenever you need it — or take it with you: **make it yours** on the Customize page (links, snippets, clocks, text blocks, language and accent color), then **Save as HTML** to bake your own standalone edition you can keep, carry and reopen anywhere, fully offline.',
   tagline:'One file. No server. No account. No cookies.',
   headline:'',
-  highlights:['sketch','subnet','cli','phrases','split','batch','notes','diff','snippets']
+  highlights:['subnet','split','snippets','sketch','phrases','cli','clocks','diff','notes']
 };
 let HOME={sub:HOME_DEFAULT.sub, tagline:HOME_DEFAULT.tagline, headline:HOME_DEFAULT.headline, highlights:HOME_DEFAULT.highlights.slice()};
 function renderHome(){
