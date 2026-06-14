@@ -1673,6 +1673,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
         <div class="sn-add-body">
           <div class="field-row">
             <div class="field" style="max-width:190px"><label for="snVendor">Vendor</label><select id="snVendor"></select></div>
+            <div class="field" style="max-width:190px"><label for="snLevel">Level</label><select id="snLevel"><option value="readonly">Read-only</option><option value="admin" selected>Admin</option><option value="root">Root</option></select></div>
             <div class="field" style="max-width:220px"><label for="snCat">Category</label><input type="text" id="snCat" placeholder="e.g. Interfaces" spellcheck="false" autocomplete="off"></div>
             <div class="field"><label for="snTitle">Title</label><input type="text" id="snTitle" placeholder="Short name" spellcheck="false" autocomplete="off"></div>
           </div>
@@ -1979,7 +1980,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev4 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev5 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -4740,11 +4741,12 @@ function snRender(filter){
   const dnd=!q;
   el.innerHTML=cats.map(c=>'<div class="sn-cat" data-cat="'+esc(c)+'">'+esc(c)+'</div>'+byC[c].map(o=>snCard(o.s,o.i,dnd)).join('')).join('');
 }
-function snFormReset(){ snEditIdx=-1; ['snCat','snTitle','snTags','snBody'].forEach(id=>{if($(id))$(id).value='';}); if($('snVendor'))$('snVendor').value=snVendorSel; $('snAdd').textContent='Add snippet'; $('snFormTitle').textContent='Add a snippet'; $('snCancel').style.display='none'; if($('snAddCard'))$('snAddCard').open=false; }
+function snFormReset(){ snEditIdx=-1; ['snCat','snTitle','snTags','snBody'].forEach(id=>{if($(id))$(id).value='';}); if($('snVendor'))$('snVendor').value=snVendorSel; if($('snLevel'))$('snLevel').value='admin'; $('snAdd').textContent='Add snippet'; $('snFormTitle').textContent='Add a snippet'; $('snCancel').style.display='none'; if($('snAddCard'))$('snAddCard').open=false; }
 function snLoadForm(i){
   const s=SNIPPETS[i]; if(!s) return;
   snEditIdx=i;
   if($('snVendor')) $('snVendor').value=snVendorValid(s.vendor);
+  if($('snLevel')) $('snLevel').value=validLevel(s.level);
   $('snCat').value=s.cat||''; $('snTitle').value=s.title||''; $('snTags').value=(Array.isArray(s.tags)?s.tags.join(', '):''); $('snBody').value=s.body||'';
   $('snAdd').textContent='Save changes'; $('snFormTitle').textContent='Edit snippet'; $('snCancel').style.display=''; if($('snAddCard')){ $('snAddCard').open=true; $('snAddCard').scrollIntoView({behavior:'smooth',block:'nearest'}); } $('snBody').focus();
 }
@@ -4753,7 +4755,8 @@ function snSubmit(){
   const cat=$('snCat').value.trim()||'Snippets', title=$('snTitle').value.trim(), body=$('snBody').value;
   const tags=$('snTags').value.split(',').map(x=>x.trim()).filter(Boolean).slice(0,12);
   if(!title && !body.trim()){ showToast('Add a title or a snippet body first'); return; }
-  const obj={vendor,cat,title:title||'Untitled',body}; if(tags.length) obj.tags=tags;
+  const level=validLevel($('snLevel')?$('snLevel').value:'admin');
+  const obj={vendor,cat,title:title||'Untitled',body}; if(tags.length) obj.tags=tags; obj.level=level;
   if(snEditIdx>=0 && SNIPPETS[snEditIdx]){ SNIPPETS[snEditIdx]=obj; showToast('Snippet updated'); }
   else { SNIPPETS.push(obj); showToast('Snippet added'); }
   if(typeof markCustom==='function') markCustom(cfgLabel);
