@@ -289,6 +289,11 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .res .v small{color:var(--text-faint);font-size:.76rem}
 .copy{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:var(--text-faint);padding:3px;border-radius:5px;transition:.14s;line-height:0}
 .copy:hover{color:var(--brand);background:var(--brand-tint)}
+/* dev14: generalized click-to-copy affordance on result/output surfaces */
+.res.copyable,.sc-out.copyable,.sb-out.copyable{cursor:pointer}
+.sc-out.copyable:hover,.sb-out.copyable:hover{border-color:var(--brand-deep)}
+.res.done,.sc-out.done,.sb-out.done{border-color:var(--ok)}
+#ipcOut .res .copy{pointer-events:none}   /* IP-CIDR cells copy via the whole-cell handler; the glyph is a visible affordance only */
 .copy.done{color:var(--ok)}
 .copy svg{width:14px;height:14px;display:block;stroke:currentColor;fill:none}
 
@@ -2042,7 +2047,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev13 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev14 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -2759,6 +2764,20 @@ function copyText(txt,btn,msg){
   else fb(txt,done);
   function fb(t,cb){const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');cb();}catch(e){}document.body.removeChild(ta);}
 }
+/* Generalized click-to-copy for read-only result/output surfaces — reuses copyText
+   and the Vault's selection-wins guard. el -> role=button + keyboard-activable;
+   getText() supplies the value; clicks on an inner copy button/link are ignored
+   (those copy themselves, with stopPropagation). No edit-mode guard (outputs aren't editable). */
+function makeCopyable(el,getText,msg,noKbd){
+  if(!el) return;
+  el.classList.add('copyable');   /* cursor/hover affordance — added even when keyboard is opted out */
+  if(!noKbd){ el.setAttribute('role','button'); el.setAttribute('tabindex','0'); }   /* keyboard support; the Splitter opts out (up to 512 cells = too many tab-stops) */
+  const fire=()=>{ const sel=window.getSelection?window.getSelection():null;
+    if(sel && !sel.isCollapsed && sel.toString().trim() && el.contains(sel.anchorNode)) return;   /* selection wins */
+    const t=getText&&getText(); if(t) copyText(t,el,msg); };
+  el.addEventListener('click',e=>{ if(e.target.closest('.copy,button,a')) return; fire(); });
+  if(!noKbd) el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fire(); } });
+}
 /* Clear-X — injects a small × button into a search/input wrapper (.dash-search
    or a plain .field). Adds the .clearable hook so the same CSS positions and
    shows the button in either wrapper. Visibility is pure CSS
@@ -2985,10 +3004,11 @@ function calcV4(ip,prefix){
     cls:ipClass((ipLong>>>24)&255),type:v4Type(ipLong),
     hex:'0x'+network.toString(16).toUpperCase().padStart(8,'0')};
 }
-function resCell(k,v,sub,cls){
+function resCell(k,v,sub,cls,noKbd){
   const d=document.createElement('div');d.className='res'+(cls?' '+cls:'');
   d.innerHTML='<div class="k">'+k+'</div><div class="v">'+esc(v)+(sub?' <small>'+esc(sub)+'</small>':'')+'</div><button class="copy" title="Copy">'+COPY_SVG+'</button>';
   d.querySelector('.copy').addEventListener('click',e=>{e.stopPropagation();copyText(v,e.currentTarget);});
+  makeCopyable(d,()=>v,'Copied',noKbd);   /* whole-cell click-to-copy; the .copy button keeps its own stopPropagation handler. noKbd: keep click/touch, skip per-cell keyboard (Splitter) */
   return d;
 }
 function resCellHtml(k,v,sub,cls){
@@ -3140,7 +3160,7 @@ function runSplit(){
     const sNet=(baseNet+i*step)>>>0, wc=(~prefixToMask(newPfx))>>>0, bc=(sNet|wc)>>>0;
     const lo=newPfx>=31?sNet:(sNet+1)>>>0, hi=newPfx>=31?bc:(bc-1)>>>0;
     const range=newPfx===32?longToIp(sNet):longToIp(lo)+' – '+longToIp(hi);
-    g.appendChild(resCell('#'+(i+1)+'  '+longToIp(sNet)+'/'+newPfx, range, newPfx>=31?'':'bc '+longToIp(bc)));
+    g.appendChild(resCell('#'+(i+1)+'  '+longToIp(sNet)+'/'+newPfx, range, newPfx>=31?'':'bc '+longToIp(bc), '', true));   /* noKbd: up to 512 cells — click/touch copy only, no per-cell tab-stop */
   }
   if(count>CAP){const d=document.createElement('div');d.className='res';d.innerHTML='<div class="k">Note</div><div class="v">'+fmt(count-CAP)+' more subnets not shown (display capped at '+CAP+').</div>';g.appendChild(d);}
   $('splitRes').classList.add('show');
@@ -3176,7 +3196,7 @@ function runIpCheck(){
     else{
       const hits=blocks.filter(b=>qb.net>=b.net&&qb.bc<=b.bc);
       html+='<div class="card"><div class="cli-plabel" style="margin-bottom:11px">Blocks containing '+esc(q)+'</div>';
-      html+=hits.length?('<div class="grid">'+hits.map(b=>'<div class="res special"><div class="k">match</div><div class="v">'+esc(b.raw)+'</div></div>').join('')+'</div>'):'<div class="dash-empty">No block in the list contains this.</div>';
+      html+=hits.length?('<div class="grid">'+hits.map(b=>'<div class="res special"><div class="k">match</div><div class="v">'+esc(b.raw)+'</div><button class="copy" title="Copy">'+COPY_SVG+'</button></div>').join('')+'</div>'):'<div class="dash-empty">No block in the list contains this.</div>';
       html+='</div>';
     }
   }
@@ -3186,10 +3206,11 @@ function runIpCheck(){
   html+=ov.length?('<div class="grid">'+ov.map(p=>{
     const sub=(p[0].net>=p[1].net&&p[0].bc<=p[1].bc)?esc(p[0].raw)+' ⊆ '+esc(p[1].raw)
              :(p[1].net>=p[0].net&&p[1].bc<=p[0].bc)?esc(p[1].raw)+' ⊆ '+esc(p[0].raw):'partial overlap';
-    return '<div class="res"><div class="k">'+sub+'</div><div class="v">'+esc(p[0].raw)+' ↔ '+esc(p[1].raw)+'</div></div>';
+    return '<div class="res"><div class="k">'+sub+'</div><div class="v">'+esc(p[0].raw)+' ↔ '+esc(p[1].raw)+'</div><button class="copy" title="Copy">'+COPY_SVG+'</button></div>';
   }).join('')+'</div>'):'<div class="dash-empty">No overlaps among the listed blocks.</div>';
   html+='</div>';
   $('ipcOut').innerHTML=html;
+  $('ipcOut').querySelectorAll('.res').forEach(c=>{ const vEl=c.querySelector('.v'); if(vEl) makeCopyable(c,()=>vEl.textContent.trim(),'Copied'); });   /* string-rendered .res cells -> click-to-copy (their .copy glyph is a decorative affordance) */
 }
 function initIpCheck(){
   $('ipcGo').addEventListener('click',runIpCheck);
@@ -5560,6 +5581,7 @@ function initScript(){
     const el=$(id); if(el){ el.addEventListener('input',scRender); el.addEventListener('change',scRender); }
   });
   $('scCopy').addEventListener('click',e=>{ const s=scBuild(); if(s) copyText(s,e.currentTarget,'Script copied'); else showToast('Add some commands first'); });
+  makeCopyable($('scOut'),scBuild,'Script copied');   /* whole-box click-to-copy */
   $('scClear').addEventListener('click',()=>{ ['scTitle','scVars','scCmds'].forEach(id=>{if($(id))$(id).value='';}); scRender(); });
   $('scSaveSnippet').addEventListener('click',scSaveAsSnippet);
   $('scDownload').addEventListener('click',()=>{
@@ -5601,6 +5623,7 @@ function initSearch(){
     const el=$(id); if(el){ el.addEventListener('input',sbRender); el.addEventListener('change',sbRender); }
   });
   $('sbCopy').addEventListener('click',e=>{ const q=sbBuild(); if(q) copyText(q,e.currentTarget,'Query copied'); else showToast('Nothing to copy yet'); });
+  makeCopyable($('sbOut'),sbBuild,'Query copied');   /* whole-box click-to-copy */
   $('sbClear').addEventListener('click',()=>{ ['sbTerms','sbPhrase','sbAny','sbNone','sbSite','sbTitle','sbUrl','sbAfter','sbBefore'].forEach(id=>{if($(id))$(id).value='';}); if($('sbType'))$('sbType').value='any'; sbRender(); });
   $('sbOpen').addEventListener('click',()=>{
     const q=sbBuild(); if(!q){ showToast('Build a query first'); return; }
