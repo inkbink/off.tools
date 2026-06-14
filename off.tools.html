@@ -197,27 +197,19 @@ body:not(.editing) .wc-acts{display:none !important}
 
 @media(max-width:840px){
   .layout{flex-direction:column}
-  .sidebar{width:100%;height:auto;position:static;display:flex;gap:6px;overflow-x:auto;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--surface)}
-  /* v0.73 fix: the strip never engaged — the items live inside #nav, a single flex
-     child, so .sidebar's flex made a row of ONE element and the items stacked
-     full-height. Flexing #nav itself produces the intended one-row swipe strip. */
-  #nav{display:flex;gap:6px}
-  /* v0.73 root-cause fix: .layout{align-items:flex-start} is correct in desktop ROW
-     mode, but once the layout flips to a COLUMN here, align-items governs the
-     HORIZONTAL axis — a non-stretched column item sizes to its CONTENT, so .main
-     became as wide as the active panel's longest unbreakable run (Phrasendrescher's
-     nowrap block lines ≈ 950px, Snippet Vault's longest code line ≈ 620px).
-     .sidebar was already pinned with width:100%; .main never was. */
-  .main{width:100%}
-  .nav-label,.sidebar-foot{display:none}
-  .nav-item{margin-bottom:0;white-space:nowrap;padding:9px 14px}
-  .nav-item.active::before{display:none}
-  .main{padding:20px 16px 60px}
+  .sidebar{display:none}                 /* dev17: swipe strip retired — ⌘K is the nav */
+  .wordmark .v{display:none}             /* dev17 fix: ape-head only on mobile — wordmark text pushes the controls off-screen */
+  .main{width:100%;padding:20px 16px 60px}
   .topbar-inner{padding:0 16px}
-  /* v0.73: long unbroken words (incl. user-customized hero text) must wrap rather
-     than widen the page; panes must be allowed to shrink below content width */
+  /* long unbroken words (incl. customized hero text) must wrap rather than widen the page */
   .home-tagline,.home-headline-line,.home-sub{overflow-wrap:break-word}
   .ph-palette,.ph-compose{min-width:0}
+  /* dev17 MOBILE NAV BREAKPOINT: ⌘K trigger becomes the obvious mobile menu — full-opacity
+     pill + visible "Tools" label. The .topbar prefix lifts specificity above the base
+     .cmdk-btn rule (defined later in source). Single flip: change 840→560 above to make
+     this phone-only; tablets (561–840) then keep the full desktop sidebar. */
+  .topbar .cmdk-btn{opacity:1;height:38px;padding:0 15px;gap:8px;background:rgba(255,255,255,.20);border-color:rgba(255,255,255,.34);font-size:.9rem;font-weight:600}
+  .topbar .cmdk-btn .cmdk-btn-t{display:inline}
 }
 
 /* ---------- Cards & inputs ---------- */
@@ -841,6 +833,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 .cmdk-btn:hover{opacity:1;background:rgba(255,255,255,.18)}
 .cmdk-btn svg{width:16px;height:16px;stroke:currentColor;fill:none}
 .cmdk-btn kbd{font-family:var(--mono);font-size:.68rem;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);border-radius:5px;padding:1px 5px;color:#fff}
+.cmdk-btn-t{display:none}   /* dev17: mobile-only "Tools" label on the cmdk trigger — shown at the nav breakpoint */
 @media(max-width:600px){.cmdk-btn kbd{display:none}}
 .cmdk-overlay{position:fixed;inset:0;background:rgba(12,40,52,.5);backdrop-filter:blur(2px);display:none;align-items:flex-start;justify-content:center;z-index:80;padding:13vh 18px 18px}
 .cmdk-overlay.show{display:flex}
@@ -868,7 +861,14 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 .cmdk-item.cmdk-tile .cmdk-ic svg{width:14px;height:14px}
 .cmdk-tlabel{font-weight:500;font-size:.79rem;color:var(--text);line-height:1.2;white-space:normal}
 .cmdk-item.cmdk-tile.sel{border-color:var(--brand);background:var(--brand-tint)}
-@media(max-width:560px){.cmdk-tilegrid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}}
+@media(max-width:560px){
+  /* dev17: cmdk is the primary mobile nav — tighter tiles + a roomier sheet that sits higher */
+  .cmdk-tilegrid{grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:6px}
+  .cmdk-item.cmdk-tile{padding:8px;gap:5px}
+  .cmdk-tlabel{font-size:.74rem}
+  .cmdk-overlay{padding:7vh 10px 10px}
+  .cmdk{max-height:80vh}
+}
 .cmdk-empty{padding:26px;text-align:center;color:var(--text-faint);font-size:.88rem}
 
 /* ---------- Search builder ---------- */
@@ -915,7 +915,17 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 .hc-time{font-family:var(--mono);font-size:.95rem;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1}
 .hc-date{font-size:.74rem;opacity:.85;white-space:nowrap;line-height:1}
 @media(max-width:720px){.hc-date{display:none}}
-@media(max-width:560px){.hdr-clock{display:none}}
+@media(max-width:560px){
+  .hdr-clock{display:none}
+  /* dev17 fix: keep the whole topbar on one row down to ~320px when the Customized badge shows.
+     Ape-head only (wordmark text hidden at the nav breakpoint), dot-only badge, tighter toggle;
+     controls never shrink so onlineToggle stays reachable. */
+  .topbar-inner{gap:10px}
+  .brand-mark{width:38px;height:38px}
+  .custom-badge{width:34px;padding:0;gap:0;justify-content:center;font-size:0}
+  .online-toggle{min-width:92px}
+  .hdr-controls{flex-shrink:0}
+}
 .ht-chip{display:flex;align-items:center;gap:2px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:2px 3px 2px 2px}
 .ht-chip.done{animation:htflash 1s ease-in-out infinite}
 @keyframes htflash{0%,100%{background:rgba(255,255,255,.14)}50%{background:rgba(53,200,140,.55)}}
@@ -1142,7 +1152,7 @@ body:not(.editing) .sn-body.done{border-left-color:var(--ok);background:var(--ok
       <div class="hdr-controls">
         <button class="custom-badge" id="customBadge" style="display:none" title="About this customized build">Customized</button>
         <button class="cmdk-btn" id="cmdkBtn" title="Quick actions (Ctrl / Cmd + K)" aria-label="Quick actions and tool search">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6a3 3 0 1 1 3 3h-3V6zM9 6a3 3 0 1 0-3 3h3V6zM15 18a3 3 0 1 0 3-3h-3v3zM9 18a3 3 0 1 1-3-3h3v3z"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6a3 3 0 1 1 3 3h-3V6zM9 6a3 3 0 1 0-3 3h3V6zM15 18a3 3 0 1 0 3-3h-3v3zM9 18a3 3 0 1 1-3-3h3v3z"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg><span class="cmdk-btn-t">Tools</span>
         </button>
         <button class="online-toggle" id="onlineToggle" role="switch" aria-checked="false" title="Check whether your Link Board links currently respond">
           <span class="ot-dot"></span><span class="ot-text">Offline</span><span class="ot-hover">Check links</span>
@@ -2061,7 +2071,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev16 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev17 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -2482,15 +2492,15 @@ const TOOLS = [
   { id:'phrases',   label:'Phrasendrescher', title:'Phrasendrescher',     sub:'Assemble messages from reusable text blocks — firewall requests, info asks, status updates.', icon:ICONS.phrases },
   { id:'notes',     label:'Notepad',         title:'Notepad',             sub:'Ephemeral scratchpad — deliberately never saved.', icon:ICONS.notes },
 
-  { id:'snippets',  group:'Commands',  label:'Snippet Vault',   title:'Snippet Vault',       sub:'Save reusable commands and config blocks — searchable, tagged, and carried in your saved build.', icon:ICONS.snippets },
-  { id:'cli',       group:'Commands',  label:'CLI Commander',   title:'CLI Commander',       sub:'Compose CLI commands — Barracuda, Linux, Cisco IOS, Windows.', icon:ICONS.cli },
-  { id:'batch',     group:'Commands',  label:'Batch Commander', title:'Batch Commander',     sub:'Turn a list of hosts (or a whole CIDR) into ready-to-run commands or a script.', icon:ICONS.batch },
-  { id:'script',    group:'Commands',  label:'Script Commander',title:'Script Commander',    sub:'Assemble commands into a ready-to-run Bash, PowerShell or Batch script.', icon:ICONS.script },
-
   { id:'subnet',    group:'Network',   label:'Subnet Calculator', title:'Subnet Calculator', sub:'Calculate IPv4 & IPv6 networks — mask, range, hosts and binary view.', icon:ICONS.subnet },
   { id:'split',     group:'Network',   label:'Subnet Splitter', title:'Subnet Splitter',     sub:'Split a network into equal subnets at a chosen prefix.', icon:ICONS.split },
   { id:'ipcheck',   group:'Network',   label:'IP / CIDR Checker', title:'IP / CIDR Checker', sub:'Test which blocks contain an address and find overlaps in a list.', icon:ICONS.check },
   { id:'baseconv',  group:'Network',   label:'MAC Converter',   title:'MAC Converter',       sub:'Normalize a MAC address into colon, hyphen, Cisco and bare formats, and identify the vendor (OUI).', icon:ICONS.convert },
+
+  { id:'snippets',  group:'Commands',  label:'Snippet Vault',   title:'Snippet Vault',       sub:'Save reusable commands and config blocks — searchable, tagged, and carried in your saved build.', icon:ICONS.snippets },
+  { id:'cli',       group:'Commands',  label:'CLI Commander',   title:'CLI Commander',       sub:'Compose CLI commands — Barracuda, Linux, Cisco IOS, Windows.', icon:ICONS.cli },
+  { id:'batch',     group:'Commands',  label:'Batch Commander', title:'Batch Commander',     sub:'Turn a list of hosts (or a whole CIDR) into ready-to-run commands or a script.', icon:ICONS.batch },
+  { id:'script',    group:'Commands',  label:'Script Commander',title:'Script Commander',    sub:'Assemble commands into a ready-to-run Bash, PowerShell or Batch script.', icon:ICONS.script },
 
   { id:'diff',      group:'Utilities', label:'Text Compare',    title:'Text & Config Compare', sub:'Put two versions side by side and highlight the differences.', icon:ICONS.diff },
   { id:'tokens',    group:'Utilities', label:'Token Counter',   title:'Token Counter',       sub:'Characters, words, bytes and a language-aware token estimate.', icon:ICONS.tokens },
@@ -5920,6 +5930,7 @@ function overlayFocusables(box){ return box?[...box.querySelectorAll('a[href],bu
 function overlayOpen(overlay,focusEl){
   overlayReturnFocus=(document.activeElement && document.activeElement!==document.body)?document.activeElement:null;
   overlay.classList.add('show');
+  if(focusEl===false) return;   /* explicit opt-out of autofocus — mobile cmdk browses first, soft keyboard stays down */
   const t=focusEl||overlayFocusables(overlay.querySelector('.cmdk,.modal'))[0];
   if(t) try{ t.focus(); }catch(e){}
 }
@@ -5979,7 +5990,7 @@ function cmdkRender(q){
 function cmdkMove(d){ if(!cmdkFiltered.length) return; cmdkSel=(cmdkSel+d+cmdkFiltered.length)%cmdkFiltered.length; cmdkRender($('cmdkInput').value); }
 function cmdkRun(){ const c=cmdkFiltered[cmdkSel]; if(c){ cmdkClose(); c.run(); } }
 function cmdkIsOpen(){ return $('cmdk').classList.contains('show'); }
-function cmdkOpen(){ const inp=$('cmdkInput'); inp.value=''; cmdkSel=0; cmdkRender(''); overlayOpen($('cmdk'), inp); }
+function cmdkOpen(){ const inp=$('cmdkInput'); inp.value=''; cmdkSel=0; cmdkRender(''); const coarse=window.matchMedia&&matchMedia('(pointer:coarse)').matches; overlayOpen($('cmdk'), coarse?false:inp); }
 function cmdkClose(){ overlayClose($('cmdk')); }
 function initCmdK(){
   const isMac=/Mac|iPhone|iPad|iPod/.test((typeof navigator!=='undefined'&&(navigator.platform||navigator.userAgent))||'');
