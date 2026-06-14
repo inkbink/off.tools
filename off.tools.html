@@ -2011,7 +2011,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev9 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev10 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -2749,9 +2749,14 @@ function initClearX(){ ['dashSearch','cliSearch','phSearch','wcSearch','snSearch
    Navigation (data-driven from TOOLS)
    ========================================================================= */
 let currentTool='home';
+/* Tools the user has hidden from discovery (nav / ⌘K / home grid). Persisted as
+   hiddenTools; never disables a tool — deliberate activate() hand-offs still work. */
+const NAV_LOCKED=new Set(['home','customize','help']);   /* recovery path: never hideable */
+let HIDDEN=new Set();
+function sanitizeHidden(arr){ return Array.isArray(arr)?[...new Set(arr.filter(id=>TOOLS.some(t=>t.id===id) && !NAV_LOCKED.has(id)))]:[]; }
 function buildNav(){
   const nav=$('nav');
-  const visible=TOOLS.filter(t=>!t.online||online);
+  const visible=TOOLS.filter(t=>(!t.online||online) && !HIDDEN.has(t.id));
   const groups=[],byG={};
   visible.forEach(t=>{const g=t.group||'';if(!(g in byG)){byG[g]=[];groups.push(g);}byG[g].push(t);});
   const N=visible.length; let gi=0;   // running index → rainbow hue (0=red … 300=violet)
@@ -4209,7 +4214,7 @@ function bakeState(){
   document.getElementById('phrasesData').textContent=JSON.stringify(PHRASES,null,1).replace(/</g,'\\u003c');
   document.getElementById('snippetsData').textContent=JSON.stringify(SNIPPETS,null,1).replace(/</g,'\\u003c');
   document.getElementById('clocksData').textContent=JSON.stringify(CLOCKS,null,1).replace(/</g,'\\u003c');
-  document.getElementById('offConfig').textContent=JSON.stringify({custom:isCustom,label:cfgLabel,lang:phLang,theme:currentTheme,spectrum:SPECTRUM,lockConfidential:lockConfidential,snipVendors:SNIP_VENDORS,home:HOME});
+  document.getElementById('offConfig').textContent=JSON.stringify({custom:isCustom,label:cfgLabel,lang:phLang,theme:currentTheme,spectrum:SPECTRUM,lockConfidential:lockConfidential,snipVendors:SNIP_VENDORS,home:HOME,hiddenTools:[...HIDDEN]});
   document.documentElement.setAttribute('data-off', isCustom?'custom':'default');
 }
 function offFileName(){
@@ -4511,7 +4516,7 @@ function renderHome(){
   const hd=$('homeHeadline'); if(hd) hd.innerHTML=esc(HOME.headline).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
   const sub=$('homeSub'); if(sub) sub.innerHTML=esc(HOME.sub).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
   const grid=$('homeGrid'); if(!grid) return;
-  const ids=(HOME.highlights||[]).filter(id=>TOOLS.some(t=>t.id===id));
+  const ids=(HOME.highlights||[]).filter(id=>TOOLS.some(t=>t.id===id) && !HIDDEN.has(id));   /* render-only filter; HOME.highlights is not mutated, so un-hiding restores the tile */
   homeTileObjs=ids.map(id=>({id}));                         /* stable object list so the shared reorder engine never sees a string primitive */
   const many=ids.length>1;
   grid.innerHTML=homeTileObjs.map((o,i)=>{
@@ -4579,7 +4584,7 @@ function homeTileAdd(id){
 }
 function homeRenderAddSel(){
   const sel=$('homeAddSel'), btn=$('homeAddBtn'), note=$('homeAddNote'); if(!sel) return;
-  const addable=TOOLS.filter(t=>t.id!=='home' && !HOME.highlights.includes(t.id));   /* every tool except home, minus those already shown (customize + help included) */
+  const addable=TOOLS.filter(t=>t.id!=='home' && !HOME.highlights.includes(t.id) && !HIDDEN.has(t.id));   /* every tool except home, minus those already shown or hidden (customize + help included) */
   sel.innerHTML=addable.map(t=>'<option value="'+esc(t.id)+'">'+esc(t.label)+'</option>').join('');
   const full=HOME.highlights.length>=12, none=addable.length===0;
   sel.disabled=full||none; if(btn) btn.disabled=full||none;
@@ -5200,7 +5205,7 @@ function cfgRefreshPreview(){ const t=$('cfgPaste'); if(t && document.activeElem
 function buildConfig(){
   /* PERSISTENCE 1/4 — every savable global appears here. If you add state,
      also update applyConfig, bakeState and the BASELINE snapshot. */
-  return { off_config:1, label:cfgLabel||'', lang:phLang, theme:currentTheme, spectrum:SPECTRUM, lockConfidential:lockConfidential, home:HOME, links:linksForSave(), phrases:PHRASES, snippets:SNIPPETS, snipVendors:SNIP_VENDORS, clocks:CLOCKS };
+  return { off_config:1, label:cfgLabel||'', lang:phLang, theme:currentTheme, spectrum:SPECTRUM, lockConfidential:lockConfidential, home:HOME, hiddenTools:[...HIDDEN], links:linksForSave(), phrases:PHRASES, snippets:SNIPPETS, snipVendors:SNIP_VENDORS, clocks:CLOCKS };
 }
 /* Anti-DoS: generous upper bounds on imported array sizes — never reached in
    real use, but they keep a maliciously huge config from freezing the tab. */
@@ -5247,6 +5252,12 @@ function applyConfig(cfg,opts){
       if(ids.length) HOME.highlights=ids;
     }
     if(typeof renderHome==='function') renderHome(); touched=true;
+  }
+  if('hiddenTools' in cfg){
+    HIDDEN=new Set(sanitizeHidden(cfg.hiddenTools));
+    if(typeof buildNav==='function') buildNav();
+    if(typeof renderHome==='function') renderHome();
+    touched=true;
   }
   if(Array.isArray(cfg.snipVendors)){
     SNIP_VENDORS=sanitizeVendors(cfg.snipVendors.slice(0,IMPORT_CAP.vendors));
@@ -5303,6 +5314,7 @@ function cfgResetToBaseline(){
   if(!SNIP_VENDORS.some(v=>v.id===snVendorSel)) snVendorSel=SNIP_VENDORS[0].id;
   CLOCKS=JSON.parse(JSON.stringify(BASELINE.clocks||[]));
   HOME=JSON.parse(JSON.stringify(BASELINE.home||HOME));
+  HIDDEN=new Set(BASELINE.hiddenTools||[]);
   cfgLabel=BASELINE.label; isCustom=BASELINE.custom;
   SPECTRUM=!!BASELINE.spectrum; applySpectrum();
   lockConfidential=!!BASELINE.lockConfidential; unlockedUrls.clear();
@@ -5310,6 +5322,7 @@ function cfgResetToBaseline(){
   if($('cfgBrand')) $('cfgBrand').value=(currentTheme?currentTheme.brand:'#0082B4');
   phSetLang(BASELINE.lang);
   renderDash($('dashSearch')?$('dashSearch').value:''); renderHomeLinks();
+  if(typeof buildNav==='function') buildNav();
   if(typeof renderHome==='function') renderHome();
   if(typeof snRender==='function') snRender($('snSearch')?$('snSearch').value:'');
   if(typeof snSyncVendorUI==='function') snSyncVendorUI();
@@ -5339,11 +5352,12 @@ function initConfig(){
       if(typeof cfg.spectrum==='boolean') SPECTRUM=cfg.spectrum;
       if(typeof cfg.lockConfidential==='boolean') lockConfidential=cfg.lockConfidential;
       if(Array.isArray(cfg.snipVendors)) SNIP_VENDORS=sanitizeVendors(cfg.snipVendors);
+      if('hiddenTools' in cfg) HIDDEN=new Set(sanitizeHidden(cfg.hiddenTools));   /* set before buildNav() runs at init, so the first nav is already filtered */
     }
   }catch(e){}
   /* PERSISTENCE 4/4 — snapshot the shipped state so "Discard changes"
      (cfgResetToBaseline) can revert to it. Mirror any new savable global here. */
-  BASELINE={links:JSON.parse(JSON.stringify(LINKS)), phrases:JSON.parse(JSON.stringify(PHRASES)), snippets:JSON.parse(JSON.stringify(SNIPPETS)), clocks:JSON.parse(JSON.stringify(CLOCKS)), home:JSON.parse(JSON.stringify(HOME)), lang:phLang, theme:currentTheme, label:cfgLabel, custom:isCustom, spectrum:SPECTRUM, lockConfidential:lockConfidential, snipVendors:JSON.parse(JSON.stringify(SNIP_VENDORS))};
+  BASELINE={links:JSON.parse(JSON.stringify(LINKS)), phrases:JSON.parse(JSON.stringify(PHRASES)), snippets:JSON.parse(JSON.stringify(SNIPPETS)), clocks:JSON.parse(JSON.stringify(CLOCKS)), home:JSON.parse(JSON.stringify(HOME)), hiddenTools:[...HIDDEN], lang:phLang, theme:currentTheme, label:cfgLabel, custom:isCustom, spectrum:SPECTRUM, lockConfidential:lockConfidential, snipVendors:JSON.parse(JSON.stringify(SNIP_VENDORS))};
   applySpectrum();
   /* sidebar entry opens the Customize tool */
   $('cfgLabelIn').addEventListener('input',e=>{ cfgLabel=e.target.value; markCustom(cfgLabel); });
@@ -5827,13 +5841,13 @@ let cmdkFiltered=[], cmdkSel=0;
 function cmdkCommands(){
   const a=[];
   a.push({kind:'setup', icon:ICONS.sliders, label:'Open Customize',               hint:'Setup',  keys:'customize setup config branding theme color language home links phrases snippets save export import discard', run:()=>activate('customize')});
-  const tools=TOOLS.filter(t=>t.id!=='customize').map(t=>({kind:'tool',icon:t.icon,label:t.label,hint:'Tool',keys:(t.label+' '+t.title+' '+t.sub).toLowerCase(),run:()=>activate(t.id)}));
+  const tools=TOOLS.filter(t=>t.id!=='customize' && !HIDDEN.has(t.id)).map(t=>({kind:'tool',icon:t.icon,label:t.label,hint:'Tool',keys:(t.label+' '+t.title+' '+t.sub).toLowerCase(),run:()=>activate(t.id)}));
   /* Link Board links — launchable from the palette. Gated on the same predicate as
      every other surface: linkLocked() hides confidential links while the Customize
      lock is on (and they aren't session-unlocked); with the lock off they're ordinary
      links. Searchable fields mirror the Link Board filter (stored fields only — a
      session-entered confidential address never goes into the search keys). */
-  const links=LINKS.filter(l=>!linkLocked(l)).map(l=>({kind:'link',icon:ICONS.ext,label:l.title||l.url,hint:l.cat||'Link',
+  const links=LINKS.filter(l=>!linkLocked(l) && l.onHome!==false).map(l=>({kind:'link',icon:ICONS.ext,label:l.title||l.url,hint:l.cat||'Link',   /* ⌘K mirrors the homepage rail (onHome) — Link Board stays the full collection */
     keys:(l.title+' '+l.url+' '+(l.desc||'')+' '+(l.cat||'')+' '+(Array.isArray(l.tags)?l.tags.join(' '):'')).toLowerCase(),
     run:()=>window.open(linkOpenUrl(l),'_blank','noopener')}));
   return a.concat(tools,links);
