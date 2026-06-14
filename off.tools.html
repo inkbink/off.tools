@@ -1966,7 +1966,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.74 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev1 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -2004,21 +2004,39 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
 [
   {"cat":"Intranet","title":"Intranet Portal","url":"https://intranet.example.net","desc":"Example link — replace with your own via Customize","class":"internal","tags":["example","intranet","portal","template"]},
   {"cat":"Intranet","title":"Password Vault","url":"https://vault.example.net","desc":"Example — confidential links ask for their address when clicked, and never store it","class":"confidential","tags":["example","secrets","vault","confidential"]},
+
+  {"cat":"Status","title":"AWS Health","url":"https://health.aws.amazon.com/health/status","desc":"AWS service health by service & region","class":"public","tags":["aws","cloud","status","health"]},
+  {"cat":"Status","title":"Azure Status","url":"https://azure.status.microsoft","desc":"Microsoft Azure service health","class":"public","tags":["azure","microsoft","cloud","status"]},
+  {"cat":"Status","title":"Google Cloud Status","url":"https://status.cloud.google.com","desc":"Google Cloud service health","class":"public","tags":["gcp","google","cloud","status"]},
+  {"cat":"Status","title":"Cloudflare Status","url":"https://www.cloudflarestatus.com","desc":"CDN, DNS & network status","class":"public","tags":["cloudflare","cdn","dns","status"]},
+  {"cat":"Status","title":"GitHub Status","url":"https://www.githubstatus.com","desc":"GitHub services status","class":"public","tags":["github","git","status"]},
+
+  {"cat":"Reference","title":"RFC Editor","url":"https://www.rfc-editor.org","desc":"Internet standards — the RFC series","class":"public","tags":["rfc","ietf","standards","reference"]},
+  {"cat":"Reference","title":"IANA Assignments","url":"https://www.iana.org/assignments","desc":"Port numbers, protocol numbers & registries","class":"public","tags":["iana","ports","protocols","registry"]},
+  {"cat":"Reference","title":"Hurricane Electric BGP","url":"https://bgp.he.net","desc":"BGP, ASN, prefix & DNS lookup toolkit","class":"public","tags":["bgp","asn","whois","dns","lookup"]},
+  {"cat":"Reference","title":"NVD","url":"https://nvd.nist.gov","desc":"CVE vulnerability database (NIST)","class":"public","tags":["cve","nvd","security","vulnerabilities"],"onHome":false},
+  {"cat":"Reference","title":"Wikipedia","url":"https://www.wikipedia.org","desc":"The free encyclopedia","class":"public","tags":["wiki","reference","encyclopedia"],"onHome":false},
+  {"cat":"Reference","title":"Heise online","url":"https://www.heise.de/en/","desc":"IT & tech news (English edition)","class":"public","tags":["heise","news","tech","it"],"onHome":false},
+  {"cat":"Reference","title":"HAMNET","url":"https://hamnet.eu","desc":"HAMNET — high-speed amateur radio IP network (Europe)","class":"public","tags":["hamnet","ham","network"]},
+  {"cat":"Reference","title":"RIPE NCC","url":"https://www.ripe.net","desc":"European IP registry — RIPE database & whois","class":"public","tags":["ripe","ip","whois","registry"]},
+  {"cat":"Reference","title":"PeeringDB","url":"https://www.peeringdb.com","desc":"Interconnection & peering database","class":"public","tags":["peering","bgp","asn","ix"],"onHome":false},
+  {"cat":"Reference","title":"MITRE ATT&CK","url":"https://attack.mitre.org","desc":"Adversary tactics & techniques knowledge base","class":"public","tags":["attack","mitre","security","ttp"],"onHome":false},
+  {"cat":"Reference","title":"explainshell","url":"https://explainshell.com","desc":"Break a shell command into its parts","class":"public","tags":["shell","cli","reference","explain"]},
+
   {"cat":"Vendor docs","title":"Barracuda Campus","url":"https://campus.barracuda.com","desc":"CloudGen Firewall documentation","class":"public","tags":["barracuda","cloudgen","docs","vendor"]},
   {"cat":"Vendor docs","title":"Cisco Support","url":"https://www.cisco.com/c/en/us/support/index.html","desc":"Product support & configuration guides","class":"public","tags":["cisco","ios","docs","vendor"]},
   {"cat":"Vendor docs","title":"Fortinet Docs","url":"https://docs.fortinet.com","desc":"FortiGate & FortiOS documentation","class":"public","tags":["fortinet","fortigate","docs","vendor"]},
   {"cat":"Vendor docs","title":"Juniper TechLibrary","url":"https://www.juniper.net/documentation/","desc":"Junos & device documentation","class":"public","tags":["juniper","junos","docs","vendor"]},
-  {"cat":"Vendor docs","title":"Microsoft Learn","url":"https://learn.microsoft.com","desc":"Windows Server, M365 & Azure documentation","class":"public","tags":["microsoft","windows","azure","docs","vendor"]},
+  {"cat":"Vendor docs","title":"Microsoft Learn","url":"https://learn.microsoft.com","desc":"Windows Server, M365 & Azure documentation","class":"public","tags":["microsoft","windows","azure","docs","vendor"],"onHome":false},
   {"cat":"Vendor docs","title":"Palo Alto Networks","url":"https://docs.paloaltonetworks.com","desc":"PAN-OS & firewall documentation","class":"public","tags":["paloalto","panos","docs","vendor"]},
   {"cat":"Vendor docs","title":"Check Point Support","url":"https://support.checkpoint.com","desc":"Quantum & firewall documentation","class":"public","tags":["checkpoint","docs","vendor"]},
-  {"cat":"Reference","title":"RFC Editor","url":"https://www.rfc-editor.org","desc":"Internet standards — the RFC series","class":"public","tags":["rfc","ietf","standards","reference"]},
-  {"cat":"Reference","title":"IANA Assignments","url":"https://www.iana.org/assignments","desc":"Port numbers, protocol numbers & registries","class":"public","tags":["iana","ports","protocols","registry"]},
-  {"cat":"Reference","title":"Hurricane Electric BGP","url":"https://bgp.he.net","desc":"BGP, ASN, prefix & DNS lookup toolkit","class":"public","tags":["bgp","asn","whois","dns","lookup"]},
-  {"cat":"Reference","title":"NVD","url":"https://nvd.nist.gov","desc":"CVE vulnerability database (NIST)","class":"public","tags":["cve","nvd","security","vulnerabilities"]},
-  {"cat":"Reference","title":"Wikipedia","url":"https://www.wikipedia.org","desc":"The free encyclopedia","class":"public","tags":["wiki","reference","encyclopedia"]},
-  {"cat":"Reference","title":"Heise online","url":"https://www.heise.de/en/","desc":"IT & tech news (English edition)","class":"public","tags":["heise","news","tech","it"]},
-  {"cat":"Break room","title":"IMDb","url":"https://www.imdb.com","desc":"Films, series & ratings","class":"public","tags":["imdb","film","tv","ratings"]},
-  {"cat":"Break room","title":"xkcd","url":"https://xkcd.com","desc":"Comics for the technically inclined","class":"public","tags":["xkcd","comics","fun"]}
+  {"cat":"Vendor docs","title":"SonicWall","url":"https://www.sonicwall.com/support/technical-documentation","desc":"SonicOS & firewall documentation","class":"public","tags":["sonicwall","sonicos","firewall","docs"],"onHome":false},
+  {"cat":"Vendor docs","title":"WatchGuard","url":"https://www.watchguard.com/wgrd-help/documentation","desc":"Firebox & Fireware documentation","class":"public","tags":["watchguard","firebox","fireware","docs"],"onHome":false},
+  {"cat":"Vendor docs","title":"MikroTik","url":"https://help.mikrotik.com/docs/","desc":"RouterOS & MikroTik documentation","class":"public","tags":["mikrotik","routeros","docs","vendor"]},
+  {"cat":"Vendor docs","title":"Netgate / pfSense","url":"https://docs.netgate.com","desc":"pfSense & TNSR firewall documentation","class":"public","tags":["pfsense","netgate","firewall","docs"],"onHome":false},
+
+  {"cat":"Break room","title":"IMDb","url":"https://www.imdb.com","desc":"Films, series & ratings","class":"public","tags":["imdb","film","tv","ratings"],"onHome":false},
+  {"cat":"Break room","title":"xkcd","url":"https://xkcd.com","desc":"Comics for the technically inclined","class":"public","tags":["xkcd","comics","fun"],"onHome":false}
 ]
 </script>
 
@@ -2174,24 +2192,24 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
 </script>
 
 <script type="application/json" id="clocksData">
-[{"tz":"Pacific/Honolulu","region":"Honolulu","sites":"Honolulu · Hilo"},
-{"tz":"America/Los_Angeles","region":"Los Angeles","sites":"Los Angeles · San Francisco · Seattle"},
-{"tz":"America/Chicago","region":"Chicago","sites":"Chicago · Houston · Dallas"},
-{"tz":"America/New_York","region":"New York","sites":"New York · Toronto · Miami"},
-{"tz":"America/Sao_Paulo","region":"São Paulo","sites":"São Paulo · Rio de Janeiro"},
-{"tz":"Atlantic/Reykjavik","region":"Reykjavík","sites":"Reykjavík"},
-{"tz":"Europe/London","region":"London","sites":"London · Dublin · Lisbon"},
-{"tz":"Europe/Vienna","region":"Vienna","sites":"Vienna · Linz · Graz","hq":true},
-{"tz":"Europe/Paris","region":"Paris","sites":"Paris · Berlin · Madrid · Rome"},
-{"tz":"Africa/Johannesburg","region":"Johannesburg","sites":"Johannesburg · Cape Town"},
-{"tz":"Europe/Moscow","region":"Moscow","sites":"Moscow · Istanbul"},
-{"tz":"Asia/Dubai","region":"Dubai","sites":"Dubai · Abu Dhabi"},
-{"tz":"Asia/Kolkata","region":"Mumbai","sites":"Mumbai · New Delhi · Bengaluru"},
-{"tz":"Asia/Singapore","region":"Singapore","sites":"Singapore · Kuala Lumpur"},
-{"tz":"Asia/Hong_Kong","region":"Hong Kong","sites":"Hong Kong · Shenzhen · Manila"},
-{"tz":"Asia/Tokyo","region":"Tokyo","sites":"Tokyo · Osaka · Seoul"},
-{"tz":"Australia/Sydney","region":"Sydney","sites":"Sydney · Melbourne · Canberra"},
-{"tz":"Pacific/Auckland","region":"Auckland","sites":"Auckland · Wellington"}]
+[{"tz":"Pacific/Honolulu","region":"Honolulu","sites":"Honolulu · Hilo · Kailua · Kaneohe · Waipahu · Pearl City · Kapolei · Kahului · Papeete · Rarotonga"},
+{"tz":"America/Los_Angeles","region":"Los Angeles","sites":"Los Angeles · San Francisco · Seattle · San Diego · San Jose · Portland · Las Vegas · Sacramento · Vancouver · Tijuana"},
+{"tz":"America/Chicago","region":"Chicago","sites":"Chicago · Houston · Dallas · San Antonio · Austin · Minneapolis · Kansas City · New Orleans · Memphis · Winnipeg"},
+{"tz":"America/New_York","region":"New York","sites":"New York · Toronto · Miami · Washington · Boston · Philadelphia · Atlanta · Montreal · Detroit · Ottawa"},
+{"tz":"America/Sao_Paulo","region":"São Paulo","sites":"São Paulo · Rio de Janeiro · Brasília · Salvador · Fortaleza · Belo Horizonte · Curitiba · Recife · Buenos Aires · Montevideo"},
+{"tz":"Atlantic/Reykjavik","region":"Reykjavík","sites":"Reykjavík · Accra · Dakar · Abidjan · Bamako · Conakry · Freetown · Lomé · Banjul · Monrovia"},
+{"tz":"Europe/London","region":"London","sites":"London · Dublin · Lisbon · Edinburgh · Manchester · Birmingham · Glasgow · Cardiff · Belfast · Porto"},
+{"tz":"Europe/Vienna","region":"Vienna","sites":"Vienna · Linz · Graz · Salzburg · Innsbruck · Bratislava · Prague · Budapest · Ljubljana · Warsaw","hq":true},
+{"tz":"Europe/Paris","region":"Paris","sites":"Paris · Berlin · Madrid · Rome · Amsterdam · Brussels · Zürich · Milan · Munich · Barcelona"},
+{"tz":"Africa/Johannesburg","region":"Johannesburg","sites":"Johannesburg · Cape Town · Durban · Pretoria · Gqeberha · Harare · Lusaka · Maputo · Gaborone · Kigali"},
+{"tz":"Europe/Moscow","region":"Moscow","sites":"Moscow · Saint Petersburg · Minsk · Istanbul · Ankara · Nairobi · Riyadh · Baghdad · Kuwait City · Addis Ababa"},
+{"tz":"Asia/Dubai","region":"Dubai","sites":"Dubai · Abu Dhabi · Sharjah · Muscat · Baku · Tbilisi · Yerevan · Samara · Port Louis · Ras Al Khaimah"},
+{"tz":"Asia/Kolkata","region":"Mumbai","sites":"Mumbai · New Delhi · Bengaluru · Kolkata · Chennai · Hyderabad · Pune · Ahmedabad · Jaipur · Colombo"},
+{"tz":"Asia/Singapore","region":"Singapore","sites":"Singapore · Kuala Lumpur · Perth · Makassar · Bandar Seri Begawan · Penang · Johor Bahru · Kuching · Kota Kinabalu · Ipoh"},
+{"tz":"Asia/Hong_Kong","region":"Hong Kong","sites":"Hong Kong · Shenzhen · Guangzhou · Shanghai · Beijing · Macau · Taipei · Manila · Zhuhai · Dongguan"},
+{"tz":"Asia/Tokyo","region":"Tokyo","sites":"Tokyo · Osaka · Seoul · Yokohama · Nagoya · Sapporo · Fukuoka · Kyoto · Busan · Incheon"},
+{"tz":"Australia/Sydney","region":"Sydney","sites":"Sydney · Melbourne · Canberra · Hobart · Newcastle · Wollongong · Geelong · Launceston · Ballarat · Bendigo"},
+{"tz":"Pacific/Auckland","region":"Auckland","sites":"Auckland · Wellington · Christchurch · Hamilton · Tauranga · Dunedin · Napier · Palmerston North · Nelson · Rotorua"}]
 </script>
 
 <script type="application/json" id="offConfig">
