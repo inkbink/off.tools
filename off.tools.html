@@ -1983,7 +1983,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
             <label class="check cfg-lock"><input type="checkbox" id="cfgLockConf"> <span class="cfg-lock-t">Lock Confidential Link addresses</span></label>
             <button type="button" class="cfg-lock-learn" id="cfgLockLearn" aria-expanded="false" aria-controls="cfgLockHow">How it works<span class="chev"></span></button>
           </div>
-          <div class="cfg-collapse-body" id="cfgLockHow" hidden><p>It's a <strong>Customize</strong> toggle (on by default) for a build you keep on a shared drive. With it on, a link classed <strong>Confidential</strong> never has its address written into the file: the saved HTML, an exported config and the JSON preview all keep only <code>https://</code> for those links — so the address isn't sitting in the file or crossing the network when someone opens it from the share. Clicking such a link asks you for the address once, opens it in a new tab, and keeps it <strong>in memory for the session</strong> so the next click just works; it's gone on reload and never written to disk. Two limits worth knowing: it protects the <em>address</em> only — a link's title, description and tags are still saved as cleartext, so keep nothing secret in those — and the prompt isn't a password (it simply opens an address you already know). Making the shared file itself read-only is a permission you set on the share, not something off.tools can enforce.</p></div>
+          <div class="cfg-collapse-body" id="cfgLockHow" hidden><p>On by default, for a build you keep on a shared drive. With it on, a link classed <strong>Confidential</strong> never has its address written into the saved HTML, an exported config or the JSON preview — only <code>https://</code> is kept. Clicking such a link asks for the address once and remembers it for the <strong>session only</strong>; it's never written to disk. It protects the <em>address</em> alone — a link's title, description and tags are still saved as cleartext. Full details are under <strong>Help &amp; FAQ → Privacy &amp; safety</strong>.</p></div>
         </div>
 
         <div class="cfg-box">
@@ -2066,6 +2066,8 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="card faq-group">
         <div class="faq-sec">Saving &amp; customizing</div>
         <details class="faq-item"><summary>How do I add my own links, snippets or text blocks?<span class="chev"></span></summary><div class="faq-a"><p>On the <strong>Link Board</strong>, <strong>Phrasendrescher</strong>, <strong>Snippet Vault</strong> and <strong>World Clocks</strong>, click the <strong>Edit</strong> pill in the page header to reveal the add, edit and reorder controls. The default view stays clean, and editing resets to view when you switch tools. Keep your additions with <strong>Customize → Save as HTML</strong>.</p></div></details>
+        <details class="faq-item"><summary>Can I make the Link Board denser?<span class="chev"></span></summary><div class="faq-a"><p>Yes. The <strong>Comfortable / Compact</strong> toggle beside the Link Board's filters switches between roomy cards and a tighter grid that keeps just the icon, title and host — handy when you have a lot of links. Your choice is remembered when you <strong>Save as HTML</strong>.</p></div></details>
+        <details class="faq-item"><summary>Can I hide tools I don't use?<span class="chev"></span></summary><div class="faq-a"><p>Yes. On the <strong>Customize</strong> page, expand <strong>Tools in the menu</strong> and untick any tool to drop it from the sidebar, the ⌘K palette and the home page. Home, Customize and Help always stay, so you can't lock yourself out — and the choice is saved with the build.</p></div></details>
         <details class="faq-item"><summary>Can off.tools help me write text blocks with AI?<span class="chev"></span></summary><div class="faq-a"><p>On the <strong>Phrasendrescher</strong> (in edit mode), the <strong>Generate blocks with AI</strong> card gives you a ready-made prompt to copy into your own assistant — off.tools itself never goes online for this. Paste the JSON the assistant returns to add the blocks; the prompt asks it to anonymize real details into placeholders.</p></div></details>
         <details class="faq-item"><summary>How do I keep my changes?<span class="chev"></span></summary><div class="faq-a"><p>Use <strong>Customize → Save as HTML</strong> (or press <kbd>⌘K</kbd> / <kbd>Ctrl-K</kbd> and choose “Open Customize”). The saved file reopens exactly as you left it, with your links, snippets, text blocks, color, language and home page intact.</p></div></details>
         <details class="faq-item"><summary>What does the “Customized” badge mean?<span class="chev"></span></summary><div class="faq-a"><p>It appears once you change any data from the shipped defaults. It marks the copy so a personalized build is never mistaken for the official one. Click the badge to jump straight to the Customize page.</p></div></details>
@@ -2091,7 +2093,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
         <div class="faq-sec">About &amp; shortcuts</div>
         <details class="faq-item"><summary>Who made this, and why?<span class="chev"></span></summary><div class="faq-a"><p><strong>off.tools</strong> was built by <strong>Thomas Kienbink</strong> in his own free time — a first real “vibe-coding” project, put together with the help of <strong>Claude AI</strong>. It began as a way to make everyday network and sysadmin chores quicker for himself, and grew into something worth sharing with colleagues and friends. It's free and open under the MIT License: use it, adapt it, pass it on.</p></div></details>
         <details class="faq-item"><summary>What's it built with, and what does “template” mean?<span class="chev"></span></summary><div class="faq-a"><p>One self-contained HTML file: hand-written <strong>HTML</strong>, <strong>CSS</strong> (custom properties, no framework) and <strong>vanilla JavaScript</strong>, with original <strong>SVG</strong> icons and a <strong>Canvas</strong> sketch tool. Your data lives in small <strong>JSON</strong> blocks embedded in the page. There's no framework, no build step, no dependencies, no CDN and no storage — which is exactly what lets it run straight from a disk, offline, indefinitely. <strong>“Template”</strong> means the file you download is a starting point: customize it with your own links, snippets, clocks and text blocks, then <strong>Save as HTML</strong> to bake that into your own standalone edition to keep or pass on.</p></div></details>
-        <details class="faq-item"><summary>Are there keyboard shortcuts?<span class="chev"></span></summary><div class="faq-a"><p><kbd>⌘K</kbd> / <kbd>Ctrl-K</kbd> opens the quick-actions palette — jump to any tool or open Customize. <kbd>Esc</kbd> closes dialogs and the palette.</p></div></details>
+        <details class="faq-item"><summary>Are there keyboard shortcuts?<span class="chev"></span></summary><div class="faq-a"><p><kbd>⌘K</kbd> / <kbd>Ctrl-K</kbd> opens the quick-actions palette — search or browse every tool as a tile grid, jump to a Link Board link, or open Customize. On a phone it doubles as the main tool menu. <kbd>Esc</kbd> closes dialogs and the palette.</p></div></details>
         <details class="faq-item"><summary>License — who made this, and can I copy it?<span class="chev"></span></summary><div class="faq-a"><p><strong>off.tools is released under the MIT License.</strong> You're free to use, copy, modify and redistribute it — even bake your own data in — as long as the copyright and license notice (kept in the page source) travels with it. It's provided <em>as-is</em>, with no warranty and no liability; verify anything that matters before acting on it. Vendor names such as Barracuda, Fortinet, Cisco and Juniper are trademarks of their respective owners — off.tools is independent and unaffiliated. The fonts fall back to your system fonts, and the icons are original.</p></div></details>
       </div>
 
@@ -2106,10 +2108,10 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev21 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev22 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
-        <p class="foot-source">Canonical source: off.tools</p>
+        <p class="foot-source">Canonical source: off.tools · github.com/inkbink/off.tools</p>
       </div>
     </div>
     <div class="foot-col">
@@ -2151,6 +2153,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
   {"cat":"Status","title":"Cloudflare Status","url":"https://www.cloudflarestatus.com","desc":"CDN, DNS & network status","class":"public","tags":["cloudflare","cdn","dns","status"]},
   {"cat":"Status","title":"GitHub Status","url":"https://www.githubstatus.com","desc":"GitHub services status","class":"public","tags":["github","git","status"]},
 
+  {"cat":"Reference","title":"off.tools on GitHub","url":"https://github.com/inkbink/off.tools","desc":"Source, releases & SHA-256 checksums — the canonical build","class":"public","tags":["off.tools","github","source","checksum"],"onHome":false},
   {"cat":"Reference","title":"RFC Editor","url":"https://www.rfc-editor.org","desc":"Internet standards — the RFC series","class":"public","tags":["rfc","ietf","standards","reference"]},
   {"cat":"Reference","title":"IANA Assignments","url":"https://www.iana.org/assignments","desc":"Port numbers, protocol numbers & registries","class":"public","tags":["iana","ports","protocols","registry"]},
   {"cat":"Reference","title":"Hurricane Electric BGP","url":"https://bgp.he.net","desc":"BGP, ASN, prefix & DNS lookup toolkit","class":"public","tags":["bgp","asn","whois","dns","lookup"]},
@@ -3626,7 +3629,7 @@ function renderDash(filter){
       const locked=linkLocked(l), host=locked?'':hostOf(linkOpenUrl(l));
       const dnd=(dashClass==='all'&&!filter);
       const tags=Array.isArray(l.tags)?l.tags.filter(Boolean):[];
-      return '<a class="link-card aff-ext'+(locked?' link-locked':' aff-glyph')+'" data-i="'+gi+'" draggable="false"'+(locked?' role="button" tabindex="0" title="Confidential — click to enter its address"':' href="'+esc(linkOpenUrl(l))+'" target="_blank" rel="noopener noreferrer" title="opens a link"')+'>'+
+      return '<a class="link-card aff-ext'+(locked?' link-locked':' aff-glyph')+'" data-i="'+gi+'" draggable="false"'+(locked?' role="button" tabindex="0" title="Confidential — click to enter its address"':' href="'+esc(linkOpenUrl(l))+'" target="_blank" rel="noopener noreferrer" title="Opens in a new tab"')+'>'+
         (dnd?gripHtml():'')+
         (locked?'<span class="link-ico link-lock-ico">'+LOCK_SVG+'</span>':favTile(host,l.title))+
         '<div class="link-body">'+
@@ -4407,7 +4410,7 @@ const SK_HINTS={
   draw:'Draw freehand with the mouse button held down.',
   erase:'Click an element to remove it (text, stamp, line, stroke).'
 };
-let sk={mode:'select',nodes:[],edges:[],strokes:[],texts:[],seq:1,drag:null,draw:null,from:null,snap:true,legend:true}, skC, skX, skStamp='Router';
+let sk={mode:'select',nodes:[],edges:[],strokes:[],texts:[],seq:1,drag:null,draw:null,from:null,snap:true,legend:true}, skC, skX, skStamp='Firewall';
 /* ---- device glyphs drawn with canvas primitives (size s, top-left x,y) ---- */
 function skGlyph(c,kind,x,y,s,col){
   c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=1.8;c.lineCap='round';c.lineJoin='round';
