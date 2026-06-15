@@ -284,8 +284,15 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .copy{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:var(--text-faint);padding:3px;border-radius:5px;transition:.14s;line-height:0}
 .copy:hover{color:var(--brand);background:var(--brand-tint)}
 /* dev14: generalized click-to-copy affordance on result/output surfaces */
-.res.copyable,.sc-out.copyable,.sb-out.copyable{cursor:pointer}
-.sc-out.copyable:hover,.sb-out.copyable:hover{border-color:var(--brand-deep)}
+/* copy = acts in place: same tile family (lift + brand fill on hover, unified .3s) but NO directional
+   bar; distinguished by a passive copy-glyph (::after, non-interactive — reads as copyable on touch)
+   + the "Copied" .done flash. The whole surface is the click target (makeCopyable / snCopyBody). */
+.copyable{position:relative;cursor:pointer;--copy-mask:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='2'%3E%3Crect%20x='9'%20y='9'%20width='11'%20height='11'%20rx='2'/%3E%3Cpath%20d='M5%2015V5a2%202%200%200%201%202-2h10'/%3E%3C/svg%3E");transition:border-color .3s,box-shadow .3s,transform .3s,background .3s}
+.copyable:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.res.copyable:hover,.sc-out.copyable:hover,.sb-out.copyable:hover{border-color:var(--brand);background:var(--brand-tint-2)}
+.copyable::after{content:"";position:absolute;top:9px;right:9px;width:15px;height:15px;background:var(--text-faint);-webkit-mask:var(--copy-mask) center/contain no-repeat;mask:var(--copy-mask) center/contain no-repeat;opacity:.5;pointer-events:none;transition:opacity .3s,background .3s}
+.copyable:hover::after{opacity:.9;background:var(--brand)}
+.copyable.done::after{opacity:1;background:var(--ok)}
 .res.done,.sc-out.done,.sb-out.done{border-color:var(--ok)}
 #ipcOut .res .copy{pointer-events:none}   /* IP-CIDR cells copy via the whole-cell handler; the glyph is a visible affordance only */
 .copy.done{color:var(--ok)}
@@ -457,7 +464,9 @@ select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-tint);ba
 .cli-preview .copy:hover{color:#fff;background:rgba(255,255,255,.12)}
 /* dev15: whole dark-box click-to-copy — faint highlight on the navy (matches the .copy:hover white-overlay idiom) */
 .cli-preview.copyable{cursor:pointer}
-.cli-preview.copyable:hover{border-color:var(--brand);box-shadow:inset 0 0 0 999px rgba(255,255,255,.05)}
+.cli-preview.copyable:hover{border-color:var(--brand);box-shadow:inset 0 0 0 999px rgba(255,255,255,.05),var(--shadow-md);transform:translateY(-2px)}
+.cli-preview.copyable::after{background:#7fb4c9}
+.cli-preview.copyable:hover::after{background:#fff}
 .cli-preview.done{border-color:var(--ok)}
 .cli-danger{display:none;margin-top:12px;padding:10px 13px;border-radius:9px;background:#fff6e8;border:1px solid #f3d39a;color:#8f6210;font-size:.84rem}
 .cli-danger.show{display:flex;gap:8px;align-items:flex-start}
@@ -1033,7 +1042,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 .sn-btn.sn-del:hover{color:var(--del);border-color:var(--del-border);background:var(--del-bg)}
 .sn-btn svg{width:13px;height:13px;stroke:currentColor;fill:none}
 .sn-tags{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end;align-items:center;flex-shrink:1;min-width:0;margin:0}
-.sn-copy{flex-shrink:0;opacity:1;width:31px;height:31px;color:var(--brand-dark);background:var(--surface-2);border-color:var(--border)}
+.sn-copy{flex-shrink:0;display:none;align-items:center;justify-content:center;width:28px;height:28px;color:var(--text-faint);background:none;border:none;pointer-events:none}
 .sn-copy svg{width:16px;height:16px}
 .sn-copy:hover{background:var(--brand-tint-2);border-color:var(--brand);color:var(--brand-dark)}
 .sn-tosc{flex-shrink:0;opacity:.7}
@@ -1489,7 +1498,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
         </div>
         <div class="cli-preview-wrap">
           <div class="cli-plabel">Composed command <button type="button" class="cli-xbtn" id="cliExplainBtn" aria-pressed="false" title="Plain-language breakdown of this command">Explain</button></div>
-          <div class="cli-preview"><span id="cliOut"></span><button class="copy" id="cliCopy" title="Copy command"><svg viewBox="0 0 24 24" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></div>
+          <div class="cli-preview"><span id="cliOut"></span></div>
           <div class="cli-explain" id="cliExplain" hidden></div>
         </div>
         <div class="cli-recent" id="cliRecent"></div>
@@ -1520,7 +1529,6 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
         <div class="cli-plabel">Generated commands <span id="batchCount" style="color:var(--text-faint);font-weight:400"></span></div>
         <div class="cli-preview" style="white-space:pre;display:block;max-height:300px;overflow:auto"><span id="batchOut"></span></div>
         <div class="cli-docs" style="border:none;padding-top:14px;margin-top:4px">
-          <button class="btn ghost" id="batchCopy">Copy all</button>
           <button class="btn" id="batchDl">Download script</button>
           <span class="dash-note" style="margin-left:6px"><svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg> The page never runs anything — it produces commands you run yourself.</span>
         </div>
@@ -1832,7 +1840,6 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
           <pre class="sc-out" id="scOut"></pre>
         </div>
         <div class="cfg-actions">
-          <button class="btn ghost" id="scCopy">Copy</button>
           <button class="btn ghost" id="scClear">Clear</button>
           <button class="btn ghost" id="scSaveSnippet">Save as snippet</button>
           <div style="flex:1"></div>
@@ -1905,7 +1912,6 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
           <div class="sb-out" id="sbOut"></div>
         </div>
         <div class="cfg-actions">
-          <button class="btn ghost" id="sbCopy">Copy query</button>
           <button class="btn ghost" id="sbClear">Clear</button>
           <div style="flex:1"></div>
           <button class="btn" id="sbOpen">Open in Google ↗</button>
@@ -3044,13 +3050,12 @@ function calcV4(ip,prefix){
 }
 function resCell(k,v,sub,cls,noKbd){
   const d=document.createElement('div');d.className='res'+(cls?' '+cls:'');
-  d.innerHTML='<div class="k">'+k+'</div><div class="v">'+esc(v)+(sub?' <small>'+esc(sub)+'</small>':'')+'</div><button class="copy" title="Copy">'+COPY_SVG+'</button>';
-  d.querySelector('.copy').addEventListener('click',e=>{e.stopPropagation();copyText(v,e.currentTarget);});
+  d.innerHTML='<div class="k">'+k+'</div><div class="v">'+esc(v)+(sub?' <small>'+esc(sub)+'</small>':'')+'</div>';
   makeCopyable(d,()=>v,'Copied',noKbd);   /* whole-cell click-to-copy; the .copy button keeps its own stopPropagation handler. noKbd: keep click/touch, skip per-cell keyboard (Splitter) */
   return d;
 }
 function resCellHtml(k,v,sub,cls){
-  return '<div class="res'+(cls?' '+cls:'')+'"><div class="k">'+esc(k)+'</div><div class="v">'+esc(v)+(sub?' <small>'+esc(sub)+'</small>':'')+'</div><button class="copy" title="Copy">'+COPY_SVG+'</button></div>';
+  return '<div class="res'+(cls?' '+cls:'')+'"><div class="k">'+esc(k)+'</div><div class="v">'+esc(v)+(sub?' <small>'+esc(sub)+'</small>':'')+'</div></div>';
 }
 function renderV4(r){
   subLastV4=r;
@@ -3234,7 +3239,7 @@ function runIpCheck(){
     else{
       const hits=blocks.filter(b=>qb.net>=b.net&&qb.bc<=b.bc);
       html+='<div class="card"><div class="cli-plabel" style="margin-bottom:11px">Blocks containing '+esc(q)+'</div>';
-      html+=hits.length?('<div class="grid">'+hits.map(b=>'<div class="res special"><div class="k">match</div><div class="v">'+esc(b.raw)+'</div><button class="copy" title="Copy">'+COPY_SVG+'</button></div>').join('')+'</div>'):'<div class="dash-empty">No block in the list contains this.</div>';
+      html+=hits.length?('<div class="grid">'+hits.map(b=>'<div class="res special"><div class="k">match</div><div class="v">'+esc(b.raw)+'</div></div>').join('')+'</div>'):'<div class="dash-empty">No block in the list contains this.</div>';
       html+='</div>';
     }
   }
@@ -3244,7 +3249,7 @@ function runIpCheck(){
   html+=ov.length?('<div class="grid">'+ov.map(p=>{
     const sub=(p[0].net>=p[1].net&&p[0].bc<=p[1].bc)?esc(p[0].raw)+' ⊆ '+esc(p[1].raw)
              :(p[1].net>=p[0].net&&p[1].bc<=p[0].bc)?esc(p[1].raw)+' ⊆ '+esc(p[0].raw):'partial overlap';
-    return '<div class="res"><div class="k">'+sub+'</div><div class="v">'+esc(p[0].raw)+' ↔ '+esc(p[1].raw)+'</div><button class="copy" title="Copy">'+COPY_SVG+'</button></div>';
+    return '<div class="res"><div class="k">'+sub+'</div><div class="v">'+esc(p[0].raw)+' ↔ '+esc(p[1].raw)+'</div></div>';
   }).join('')+'</div>'):'<div class="dash-empty">No overlaps among the listed blocks.</div>';
   html+='</div>';
   $('ipcOut').innerHTML=html;
@@ -3362,7 +3367,6 @@ function initBatch(){
   $('batchHosts').addEventListener('input',runBatch);
   $('batchWin').addEventListener('change',runBatch);
   $('batchPort').addEventListener('input',runBatch);
-  $('batchCopy').addEventListener('click',e=>{e.stopPropagation();const l=batchLines().lines;if(l.length)copyText(l.join('\n'),e.currentTarget,'Commands copied');});
   { const box=$('batchOut')&&$('batchOut').parentElement; makeCopyable(box,()=>batchLines().lines.join('\n'),'Commands copied'); }   /* dev15: whole dark-box click-to-copy */
   $('batchDl').addEventListener('click',batchDownload);
   $('batchHosts').value='10.0.0.1\n10.0.0.2\n8.8.8.8';
@@ -3928,7 +3932,6 @@ function initCli(){
   $('cliVendors').querySelectorAll('.fpill').forEach(b=>b.addEventListener('click',()=>cliSelectVendor(b.dataset.v)));
   $('cliCmd').addEventListener('change',cliRenderParams);
   $('cliExplainBtn').addEventListener('click',cliToggleExplain);
-  $('cliCopy').addEventListener('click',e=>{e.stopPropagation();copyText(cliPlain,e.currentTarget,'Command copied');cliPushRecent();});
   { const box=$('cliOut')&&$('cliOut').parentElement; makeCopyable(box,()=>cliPlain,'Command copied',false,cliPushRecent); }   /* dev15: whole dark-box click-to-copy; records to recents like the button */
   $('cliSearch').addEventListener('input',cliSearchRun);
   $('cliSearch').addEventListener('keydown',e=>{if(e.key==='Escape'){$('cliSearch').value='';cliSearchRun();}});
@@ -4816,7 +4819,7 @@ function snCard(s,i,dnd){
       '<div class="sn-head">'+(dnd?gripHtml():'')+'<span class="sn-level '+lm.c+'" title="'+esc(lm.l)+' — privilege level">'+esc(lm.l)+'</span>'+'<span class="sn-title">'+esc(s.title||'Untitled')+'</span>'+
         tags+
         '<button class="sn-btn sn-tosc" data-act="toscript" data-i="'+i+'" title="Send to Script Commander"><svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a2 2 0 0 1 2 2v13a1 1 0 0 0 1 1 1 1 0 0 0 1-1V8"/><path d="M4 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h15"/><path d="m7 9 2 2-2 2M11 13h3"/></svg></button>'+
-        '<button class="sn-btn sn-copy" data-act="copy" data-i="'+i+'" title="Copy snippet">'+COPY_SVG+'</button>'+
+        '<span class="sn-copy" aria-hidden="true">'+COPY_SVG+'</span>'+
         '<span class="sn-acts">'+
           '<button class="sn-btn" data-act="edit" data-i="'+i+'" title="Edit snippet"><svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>'+
           '<button class="sn-btn sn-del" data-act="del" data-i="'+i+'" title="Delete snippet"><svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>'+
@@ -5620,7 +5623,6 @@ function initScript(){
   ['scShell','scTitle','scVars','scCmds','scSafe','scEcho','scTs'].forEach(id=>{
     const el=$(id); if(el){ el.addEventListener('input',scRender); el.addEventListener('change',scRender); }
   });
-  $('scCopy').addEventListener('click',e=>{ const s=scBuild(); if(s) copyText(s,e.currentTarget,'Script copied'); else showToast('Add some commands first'); });
   makeCopyable($('scOut'),scBuild,'Script copied');   /* whole-box click-to-copy */
   $('scClear').addEventListener('click',()=>{ ['scTitle','scVars','scCmds'].forEach(id=>{if($(id))$(id).value='';}); scRender(); });
   $('scSaveSnippet').addEventListener('click',scSaveAsSnippet);
@@ -5662,7 +5664,6 @@ function initSearch(){
   ['sbTerms','sbPhrase','sbAny','sbNone','sbSite','sbType','sbTitle','sbUrl','sbAfter','sbBefore'].forEach(id=>{
     const el=$(id); if(el){ el.addEventListener('input',sbRender); el.addEventListener('change',sbRender); }
   });
-  $('sbCopy').addEventListener('click',e=>{ const q=sbBuild(); if(q) copyText(q,e.currentTarget,'Query copied'); else showToast('Nothing to copy yet'); });
   makeCopyable($('sbOut'),sbBuild,'Query copied');   /* whole-box click-to-copy */
   $('sbClear').addEventListener('click',()=>{ ['sbTerms','sbPhrase','sbAny','sbNone','sbSite','sbTitle','sbUrl','sbAfter','sbBefore'].forEach(id=>{if($(id))$(id).value='';}); if($('sbType'))$('sbType').value='any'; sbRender(); });
   $('sbOpen').addEventListener('click',()=>{
