@@ -1874,9 +1874,9 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
     <!-- ============ TOOL: Search Builder ============ -->
     <section class="panel" id="tool-search">
       <div class="card">
-        <p class="batch-desc" style="margin:0 0 16px">Build a precise query with Google search operators. Hover any field's <span class="sb-q">?</span> for what the operator does. Nothing is sent until you press <strong>Open in Google</strong>.</p>
+        <p class="batch-desc" style="margin:0 0 16px">Build a precise query with standard search operators. Hover any field's <span class="sb-q">?</span> for what the operator does. Nothing is sent until you press <strong>Open in DuckDuckGo</strong> — or copy the query (click the box below) to paste into any engine.</p>
         <div class="field-row">
-          <div class="field"><label>All these words <span class="sb-q" title="Plain keywords. Google requires all of them to appear (implicit AND).">?</span></label><input type="text" id="sbTerms" placeholder="vpn site-to-site mtu" spellcheck="false" autocomplete="off"></div>
+          <div class="field"><label>All these words <span class="sb-q" title="Plain keywords — all of them must appear (implicit AND).">?</span></label><input type="text" id="sbTerms" placeholder="vpn site-to-site mtu" spellcheck="false" autocomplete="off"></div>
           <div class="field"><label>Exact phrase <span class="sb-q" title="Wrapped in quotes &quot;…&quot; — matches the words in that exact order.">?</span></label><input type="text" id="sbPhrase" placeholder="phase 2 proposal" spellcheck="false" autocomplete="off"></div>
         </div>
         <div class="field-row">
@@ -1905,9 +1905,9 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
         <div class="cfg-actions">
           <button class="btn ghost" id="sbClear">Clear</button>
           <div style="flex:1"></div>
-          <button class="btn" id="sbOpen">Open in Google ↗</button>
+          <button class="btn" id="sbOpen">Open in DuckDuckGo ↗</button>
         </div>
-        <p class="batch-desc" style="margin:12px 0 0">Tip: <strong>Open in Google</strong> needs connectivity — it just launches a normal search in a new tab. The query itself is built entirely offline.</p>
+        <p class="batch-desc" style="margin:12px 0 0">Tip: <strong>Open in DuckDuckGo</strong> needs connectivity — it just launches a normal search in a new tab. The query itself is built entirely offline. The before:/after: date range is a Google-style operator DuckDuckGo ignores — copy the query and run it in Google for date filtering.</p>
       </div>
     </section>
 
@@ -2082,7 +2082,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev18 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev19 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools</p>
@@ -2515,7 +2515,7 @@ const TOOLS = [
 
   { id:'diff',      group:'Utilities', label:'Text Compare',    title:'Text & Config Compare', sub:'Put two versions side by side and highlight the differences.', icon:ICONS.diff },
   { id:'tokens',    group:'Utilities', label:'Token Counter',   title:'Token Counter',       sub:'Characters, words, bytes and a language-aware token estimate.', icon:ICONS.tokens },
-  { id:'search',    group:'Utilities', label:'LMFGIFY',  title:'LMFGIFY',      sub:'Construct a precise web search with operators — site:, filetype:, exact phrase, exclude, date range.', icon:ICONS.search },
+  { id:'search',    group:'Utilities', label:'Search Builder', title:'Search Builder',      sub:'Construct a precise web search with operators — site:, filetype:, exact phrase, exclude, date range.', icon:ICONS.search },
 
   { id:'clocks',    group:'Time',      label:'World Clocks',    title:'World Clocks',        sub:'Live local time across your sites — grouped by zone, sorted west to east, fully offline.', icon:ICONS.clock },
   { id:'timers',    group:'Time',      label:'Timers',          title:'Timers',              sub:'Focus sessions, breaks, custom countdowns or a count-down to a clock time — shown live in the header.', icon:ICONS.timer },
@@ -5659,7 +5659,7 @@ function initSearch(){
   $('sbClear').addEventListener('click',()=>{ ['sbTerms','sbPhrase','sbAny','sbNone','sbSite','sbTitle','sbUrl','sbAfter','sbBefore'].forEach(id=>{if($(id))$(id).value='';}); if($('sbType'))$('sbType').value='any'; sbRender(); });
   $('sbOpen').addEventListener('click',()=>{
     const q=sbBuild(); if(!q){ showToast('Build a query first'); return; }
-    window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank','noopener');
+    window.open('https://duckduckgo.com/?q='+encodeURIComponent(q),'_blank','noopener');
   });
   sbRender();
 }
