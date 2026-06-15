@@ -795,12 +795,10 @@ body.stale .link-ico .rdot,body.stale .hl-dot{opacity:.5}
 .hl-dot.r-bad{background:var(--del)}
 .hl-dot.r-wait{background:var(--grey);animation:reachpulse 1.2s ease-in-out infinite}
 .hl-dot.r-na{background:var(--surface);box-shadow:inset 0 0 0 2px var(--grey)}
-.home-brandrow{display:flex;align-items:center;gap:13px;margin-bottom:2px}
-.home-mark{width:38px;height:38px;margin:0;color:var(--brand);flex-shrink:0}
-.home-mark svg{width:100%;height:100%}
+.home-brandrow{display:flex;align-items:flex-start;gap:13px;margin-bottom:2px}
 .home-headline{font-family:var(--display);line-height:1.2;letter-spacing:-.01em}
-.home-headline .home-tagline{display:block;font-size:1.62rem;font-weight:500;color:var(--brand-dark)}
-.home-headline .home-headline-line{display:block;font-size:1.62rem;font-weight:700;color:var(--brand-dark);margin-top:1px}
+.home-headline .home-tagline{display:block;font-size:1.62rem;font-weight:700;color:var(--brand-dark)}
+.home-headline .home-headline-line{display:block;font-size:.92rem;font-weight:400;font-family:var(--sans);letter-spacing:0;color:var(--text-muted);margin-top:3px}
 .home-sub{max-width:660px;margin:16px 0 0;font-size:.92rem;color:var(--text-muted);line-height:1.6;white-space:pre-line}
 /* inline sub editor — a discreet, always-available pencil beside the badge */
 .home-sub-edit-wrap{max-width:660px;margin:14px 0 0}
@@ -1220,15 +1218,14 @@ body:not(.editing) .sn-body.done{border-left-color:var(--ok);background:var(--ok
         <div class="home-main">
           <div class="home-hero">
             <div class="home-brandrow">
-              <div class="home-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/><path d="M10.9 12.8h.01M13.1 12.8h.01"/></svg></div>
               <div class="home-headline"><span class="home-tagline" id="homeTagline"></span><span class="home-headline-line" id="homeHeadline"></span></div>
-              <button type="button" class="home-sub-edit home-head-edit" id="homeHeadEditBtn" title="Edit the headline" aria-label="Edit headline"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+              <button type="button" class="home-sub-edit home-head-edit" id="homeHeadEditBtn" title="Edit the header" aria-label="Edit header"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
               <button type="button" class="edit-toggle home-edit-toggle" id="homeEditToggle" aria-pressed="false" aria-label="Edit"><span class="edit-toggle-ic"></span><span class="edit-toggle-t">Edit</span></button>
             </div>
             <div class="home-sub-edit-wrap" id="homeHeadEditWrap" hidden>
-              <label class="home-head-lbl" for="homeTaglineArea">Tagline</label>
+              <label class="home-head-lbl" for="homeTaglineArea">Headline</label>
               <textarea class="home-sub-area home-head-area" id="homeTaglineArea" maxlength="2000" spellcheck="false" aria-label="Edit the tagline"></textarea>
-              <label class="home-head-lbl" for="homeHeadlineArea">Headline <span class="lite">— optional; blank shows nothing</span></label>
+              <label class="home-head-lbl" for="homeHeadlineArea">Subheader <span class="lite">— optional; blank shows nothing</span></label>
               <textarea class="home-sub-area home-head-area" id="homeHeadlineArea" maxlength="2000" spellcheck="false" aria-label="Edit the headline"></textarea>
               <div class="home-sub-edit-acts">
                 <button type="button" class="hse-btn" id="homeHeadSave">Save</button>
@@ -1236,11 +1233,9 @@ body:not(.editing) .sn-body.done{border-left-color:var(--ok);background:var(--ok
                 <span class="home-sub-hint">**bold** supported · kept with your customizations</span>
               </div>
             </div>
-            <p class="home-sub" id="homeSub">off.tools is a <strong>single HTML file</strong> — and you're looking at all of it right now. Whether you browsed to off.tools or opened it from a disk, a USB stick or a network share: this one page is the entire app. No install, no server, no accounts, no cookies, nothing to set up.
+            <p class="home-sub" id="homeSub">This whole app is the one HTML file you have open — whether you reached it at off.tools or opened it from a disk, a USB stick or a share. Every tool runs locally in this tab and keeps nothing; what you type is gone when you reload. The only thing that ever leaves your machine is a deliberate <strong>link check</strong>, which briefly asks your Link Board sites whether they respond, then stops.
 
-It's built from plain <strong>HTML, CSS and vanilla JavaScript</strong> — no framework, no build step, no dependencies, no storage. Every tool runs <strong>locally</strong> in your browser tab and keeps nothing: whatever you type is gone the moment you reload. Nothing leaves your machine unless you run a one-off <strong>link check</strong>, which briefly asks the sites on the Link Board whether they respond.
-
-Use it here whenever you need it — or take it with you: <strong>make it yours</strong> on the Customize page (links, snippets, clocks, text blocks, language and accent color), then <strong>Save as HTML</strong> to bake your own standalone edition you can keep, carry and reopen anywhere, fully offline.</p>
+Built from plain <strong>HTML, CSS and vanilla JavaScript</strong> — no framework, no build step, no dependencies, no storage — which is what lets it run straight from a disk, offline, for as long as you keep the file. <strong>Make it yours</strong> on the Customize page (links, snippets, clocks, text blocks, language, accent color), then <strong>Save as HTML</strong> to bake a standalone edition you can carry and reopen anywhere.</p>
             <div class="home-sub-edit-wrap" id="homeSubEditWrap" hidden>
               <textarea class="home-sub-area" id="homeSubArea" maxlength="2000" spellcheck="false" aria-label="Edit the description"></textarea>
               <div class="home-sub-edit-acts">
@@ -2108,7 +2103,7 @@ Use it here whenever you need it — or take it with you: <strong>make it yours<
       <div class="foot-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.2" cy="8.6" r="2.6"/><circle cx="18.8" cy="8.6" r="2.6"/><path d="M5.6 9.2a6.4 6.4 0 0 1 12.8 0c0 2.1-1 3.7-2 4.7-.6 1.6-2 3-4.4 3s-3.8-1.4-4.4-3c-1-1-2-2.6-2-4.7Z"/><ellipse cx="12" cy="13.1" rx="3.3" ry="2.3"/><circle cx="9.8" cy="9.9" r="1" fill="currentColor" stroke="none"/><circle cx="14.2" cy="9.9" r="1" fill="currentColor" stroke="none"/></svg></div>
       <div>
         <div class="foot-name"><span id="footState">off</span>.tools</div>
-        <div class="foot-ver">v0.75-dev23 · offline-first toolbox</div>
+        <div class="foot-ver">v0.75-dev24 · offline-first toolbox</div>
         <p class="foot-tag">A single-file toolbox for everyday network &amp; sysadmin work — links, snippets, subnet math, clocks and more.</p>
         <p class="foot-credit">© 2026 Thomas Kienbink · MIT</p>
         <p class="foot-source">Canonical source: off.tools · github.com/inkbink/off.tools</p>
@@ -4620,9 +4615,9 @@ function initOnline(){
    MODULE: home  (landing page — cards link to the tools)
    ========================================================================= */
 const HOME_DEFAULT={
-  sub:'off.tools is a **single HTML file** — and you\'re looking at all of it right now. Whether you browsed to off.tools or opened it from a disk, a USB stick or a network share: this one page is the entire app. No install, no server, no accounts, no cookies, nothing to set up.\n\nIt\'s built from plain **HTML, CSS and vanilla JavaScript** — no framework, no build step, no dependencies, no storage. Every tool runs **locally** in your browser tab and keeps nothing: whatever you type is gone the moment you reload. Nothing leaves your machine unless you run a one-off **link check**, which briefly asks the sites on the Link Board whether they respond.\n\nUse it here whenever you need it — or take it with you: **make it yours** on the Customize page (links, snippets, clocks, text blocks, language and accent color), then **Save as HTML** to bake your own standalone edition you can keep, carry and reopen anywhere, fully offline.',
-  tagline:'One file. No server. No account. No cookies.',
-  headline:'',
+  sub:'This whole app is the one HTML file you have open — whether you reached it at off.tools or opened it from a disk, a USB stick or a share. Every tool runs locally in this tab and keeps nothing; what you type is gone when you reload. The only thing that ever leaves your machine is a deliberate **link check**, which briefly asks your Link Board sites whether they respond, then stops.\n\nBuilt from plain **HTML, CSS and vanilla JavaScript** — no framework, no build step, no dependencies, no storage — which is what lets it run straight from a disk, offline, for as long as you keep the file. **Make it yours** on the Customize page (links, snippets, clocks, text blocks, language, accent color), then **Save as HTML** to bake a standalone edition you can carry and reopen anywhere.',
+  tagline:'One file. The whole toolbox.',
+  headline:'Everyday network & sysadmin tools — local, offline, nothing sent anywhere.',
   highlights:['subnet','split','snippets','sketch','phrases','cli','clocks','diff','notes']
 };
 let HOME={sub:HOME_DEFAULT.sub, tagline:HOME_DEFAULT.tagline, headline:HOME_DEFAULT.headline, highlights:HOME_DEFAULT.highlights.slice()};
